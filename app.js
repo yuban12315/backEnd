@@ -7,8 +7,8 @@ let session = require('express-session')
 let mongoStore = require('connect-mongo')(session)
 let bodyParser = require('body-parser');
 
-let index = require('./routes/index');
-let users = require('./routes/users');
+let index = require('./libs/controllers/index');
+let users = require('./libs/controllers/users');
 
 let config = require('./libs/config')
 let app = express();

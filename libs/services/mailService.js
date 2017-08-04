@@ -12,6 +12,8 @@ class mailService {
         })
     }
 
+    /**发送邮件
+     * 传入邮件地址和生成的验证码*/
     sendMail(data,callback){
         if (!callback){
             callback=()=>{}
