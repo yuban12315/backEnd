@@ -33,11 +33,11 @@ app.use(session({
 }))
 app.use(express.static(path.join(__dirname, 'public')));
 
-/**跨域
- * app.all('*', function (req, res, next) {
+
+app.all('*', function (req, res, next) {
     res.header('Access-Control-Allow-Origin', '*')
     next()
-})*/
+})
 
 app.use('/', index);
 app.use('/users', users);

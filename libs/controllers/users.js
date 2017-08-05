@@ -13,6 +13,7 @@ router.get('/', function (req, res, next) {
 //获取注册时验证码
 router.post('/getVcode', (req, res) => {
     let mailAdress = req.body.mailTo || null
+    console.log(req.body)
     if (mailAdress) {
         async.waterfall([
             //检查邮箱是否已经被注册
@@ -73,22 +74,22 @@ router.post('/getVcode', (req, res) => {
 })
 //注册
 router.post('/register', (req, res) => {
+    let data = req.body || {}
     async.waterfall([
         //检查data结构
         (callback) => {
-            let data = req.body || {}
             let status = true
-            if (!data.hasOwnProperty('username')) {
+            if (!data.hasOwnProperty('nickname')) {
                 status = false
             } else {
-                if (data.username.length <= 6) {
+                if (data.nickname.length < 6) {
                     status = false
                 }
             }
             if (!data.hasOwnProperty('password')) {
                 status = false
             } else {
-                if (data.password.length <= 6) {
+                if (data.password.length < 6) {
                     status = false
                 }
             }
@@ -117,9 +118,9 @@ router.post('/register', (req, res) => {
                 callback(null)
             }
         },
-        //检查用户名是否被占用
+        //检查邮箱是否被占用
         (callback) => {
-            userModel.findOne({username: data.username}).exec((err, docs) => {
+            userModel.findOne({email: data.email}).exec((err, docs) => {
                 if (err) {
                     callback(err)
                 } else if (docs != null) {
@@ -161,27 +162,29 @@ router.post('/register', (req, res) => {
 //登录
 router.post('/login', (req, res) => {
     //判断是否已经登录
-    if (req.session.logged = true) {
+    if (req.session.logged == true) {
         res.send({
             status: true,
             msg: "已经登录过"
         })
     } else {
+        let data = req.body || {}
+        console.log(data)
         async.waterfall([
             //检查data结构
             (callback) => {
                 let status = true
-                if (!data.hasOwnProperty('username')) {
+                if (!data.hasOwnProperty('email')) {
                     status = false
                 } else {
-                    if (data.username.length <= 6) {
+                    if (data.email.length < 6) {
                         status = false
                     }
                 }
                 if (!data.hasOwnProperty('password')) {
                     status = false
                 } else {
-                    if (data.password.length <= 6) {
+                    if (data.password.length < 6) {
                         status = false
                     }
                 }
@@ -193,12 +196,19 @@ router.post('/login', (req, res) => {
             },
             //登录
             (callback) => {
-                userModel.findOne({username: data.username}).exec((err, docs) => {
+                userModel.findOne({email: data.email}).exec((err, docs) => {
                     if (err) {
                         callback(err)
                     }
                     else {
-
+                        if (docs == null) {
+                            callback(new Error("用户不存在"))
+                        } else if (docs.password != data.password) {
+                            callback(new Error("密码错误"))
+                        }
+                        else {
+                            callback(null)
+                        }
                     }
                 })
             }
@@ -211,7 +221,7 @@ router.post('/login', (req, res) => {
             } else {
                 req.session.logged = true
                 req.session.username = data.username
-                console.log(req.session.username + ' ' + req.session.logged)
+                console.log(req.session.email + ' ' + req.session.logged)
                 res.send({
                     status: true,
                     msg: "登录成功"
@@ -220,6 +230,16 @@ router.post('/login', (req, res) => {
         })
     }
 
+})
+//退出登录
+router.get('/logout',(req,res)=>{
+    if (req.session.logged){
+        req.session.logged=false
+    }
+    res.send({
+        status:true,
+        msg:"退出登录成功"
+    })
 })
 //获取重置密码时验证码
 router.post('getVcode2', (req, res) => {
