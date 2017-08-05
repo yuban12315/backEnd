@@ -11,5 +11,5 @@ let config=require('./../config')
 }*/
 
 mongoose.Promise = Promise
-mongoose.connect(config.dbUrl)
+mongoose.connect(config.dbUrl,{useMongoClient: true})
 module.exports=mongoose
