@@ -3,17 +3,17 @@ let console = require('tracer').console()
 let uuid=require('uuid/v1')
 let md5 = require('crypto').createHash('md5')
 
-// userModel.findOne({email:'panjiahui@imudges.com'},{"email":"1"}).exec((err, docs) => {
-//     console.log(docs)
-//     if (err) {
-//         console.log(err)
-//     } else if (docs.length > 0) {
-//         console.log('邮箱已被使用')
-//     }
-//     else {
-//         console.log("qwe")
-//     }
-// })
+userModel.findOne({email:'panjiahui@imudges.com'},{"email":"1"}).exec((err, docs) => {
+    console.log(docs)
+    if (err) {
+        console.log(err)
+    } else if (docs===null) {
+        console.log('邮箱已被使用')
+    }
+    else {
+        console.log("qwe")
+    }
+})
 // let salt=uuid().toString().substring(0,8)
 //
 // password=md5.update(password+salt).digest('hex');
@@ -30,7 +30,7 @@ let md5 = require('crypto').createHash('md5')
 // })
 
 // let user=new userModel({
-//     username:"admin1",
+//     username:"admin",
 //     password:"123456",
 //     email:"455678228@qq.com"
 // })
