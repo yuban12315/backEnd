@@ -145,7 +145,7 @@ router.post('/register', (req, res) => {
         //用户信息存入数据库
         (callback) => {
             data._salt = uuid().toString().substring(0, 8)
-            data.password=md5.update(data.password+data._salt).digest('hex');
+            data.password = md5.update(data.password + data._salt).digest('hex');
             let user = new userModel(data)
             user.save((err, docs) => {
                 if (err) {
@@ -209,14 +209,14 @@ router.post('/login', (req, res) => {
             //登录
             (callback) => {
                 userModel.findOne({email: data.email}).exec((err, docs) => {
-                    data.password=md5.update(data.password).digest('hex');
                     if (err) {
                         callback(err)
                     }
                     else {
                         if (docs == null) {
                             callback(new Error("用户不存在"))
-                        } else if (docs.password != data.password) {
+                        } else if (docs.password != md5.update(data.password+docs._salt).digest('hex')) {
+                            //data.password = md5.update(data.password).digest('hex');
                             callback(new Error("密码错误"))
                         }
                         else {
@@ -233,7 +233,7 @@ router.post('/login', (req, res) => {
                 })
             } else {
                 req.session.logged = true
-                req.session.username = data.username
+                req.session.email = data.email
                 //console.log(req.session.email + ' ' + req.session.logged)
                 res.send({
                     status: true,
@@ -250,7 +250,7 @@ router.get('checkLogin', (req, res) => {
         logged: !!req.session.logged
     })
 })
-//退出登录*
+//退出登录
 router.get('/logout', (req, res) => {
     if (req.session.logged) {
         req.session.logged = false
@@ -365,24 +365,24 @@ router.post('/resetPassword', (req, res) => {
                 callback(new Error("验证码错误"))
             }
             else {
-                userModel.findOne({email:data.email},{"_salt":"1"}).exec((err,docs)=>{
-                    if (err){
+                userModel.findOne({email: data.email}, {"_salt": "1"}).exec((err, docs) => {
+                    if (err) {
                         callback(err)
                     }
                     else {
-                        callback(null,docs._salt)
+                        callback(null, docs._salt)
                     }
                 })
             }
         },
         //修改数据库内密码
-        (_salt,callback) => {
-            let password=md5.update(data.password+_salt).digest('hex');
-            userModel.update({email:data.email},{$set:{password:password}}).exec((err,doc)=>{
-                if (err){
+        (_salt, callback) => {
+            let password = md5.update(data.password + _salt).digest('hex');
+            userModel.update({email: data.email}, {$set: {password: password}}).exec((err, doc) => {
+                if (err) {
                     callback(err)
                 }
-                else if (doc.nModified!=1){
+                else if (doc.nModified != 1) {
                     callback(new Error("修改密码失败"))
                 }
                 else {
@@ -390,7 +390,6 @@ router.post('/resetPassword', (req, res) => {
                 }
             })
         }
-
     ], (err) => {
         if (err) {
             res.send({
@@ -406,7 +405,56 @@ router.post('/resetPassword', (req, res) => {
         }
     })
 })
-
-
+//重置昵称
+router.post('/resetNickname', (req, res) => {
+    let data=req.body||{}
+    console.log(data)
+    if (req.session.logged===true) {
+        async.waterfall([
+            (callback) => {
+                let status = true
+                if (!data.hasOwnProperty('nickname')) {
+                    status = false
+                }
+                if (status) {
+                    callback(null)
+                } else {
+                    callback(new Error("未通过结构验证"))
+                }
+            },
+            (callback) => {
+                userModel.update({email: req.session.email}, {$set: {nickname: data.nickname}}).exec((err, doc) => {
+                    if (err) {
+                        callback(err)
+                    }
+                    else if (doc.nModified != 1) {
+                        callback(new Error("修改昵称失败"))
+                    }
+                    else {
+                        callback(null)
+                    }
+                })
+            }
+        ], (err) => {
+            if (err) {
+                res.send({
+                    status: false,
+                    msg: err.message
+                })
+            }
+            else {
+                res.send({
+                    status: true,
+                    msg: "修改密码成功"
+                })
+            }
+        })
+    } else {
+        res.send({
+            status: false,
+            msg: "请先登录"
+        })
+    }
+})
 
 module.exports = router
