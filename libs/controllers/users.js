@@ -1,6 +1,6 @@
 let express = require('express')
 let mailer = require('./../services/mailService')
-let user=require('./../services/userService')
+let user = require('./../services/userService')
 let uuid = require('uuid/v1')
 let async = require('async')
 let md5 = require('crypto').createHash('md5')
@@ -10,7 +10,7 @@ let console = require('tracer').console()
 
 /* GET users listing. */
 router.get('/', function (req, res, next) {
-    res.send('respond with a resource:'+req.ip)
+    res.send('respond with a resource:' + req.ip)
 })
 //获取注册时验证码
 router.post('/getVcode', (req, res) => {
@@ -143,9 +143,21 @@ router.post('/register', (req, res) => {
                 }
             })
         },
-        //用户信息存入数据库
+        //获取位置
         (callback) => {
+            user.getAddress(req.ip, (err, loc) => {
+                if (err) {
+                    callback(err)
+                }
+                else {
+                    callback(null, loc)
+                }
+            })
+        },
+        //用户信息存入数据库
+        (callback, location) => {
             data._salt = uuid().toString().substring(0, 8)
+            data.location = location
             data.password = md5.update(data.password + data._salt).digest('hex');
             let user = new userModel(data)
             user.save((err, docs) => {
@@ -216,7 +228,7 @@ router.post('/login', (req, res) => {
                     else {
                         if (docs == null) {
                             callback(new Error("用户不存在"))
-                        } else if (docs.password != md5.update(data.password+docs._salt).digest('hex')) {
+                        } else if (docs.password != md5.update(data.password + docs._salt).digest('hex')) {
                             //data.password = md5.update(data.password).digest('hex');
                             callback(new Error("密码错误"))
                         }
@@ -243,7 +255,6 @@ router.post('/login', (req, res) => {
             }
         })
     }
-
 })
 //获取登录状态
 router.get('checkLogin', (req, res) => {
@@ -406,15 +417,61 @@ router.post('/resetPassword', (req, res) => {
         }
     })
 })
-//重置昵称
-router.post('/resetNickname', (req, res) => {
-    let data=req.body||{}
-    console.log(data)
-    if (req.session.logged===true) {
+//获取个人资料
+router.get('/getProfile', (req, res) => {
+    async.waterfall([
+        (callback) => {
+            let email = req.query.email
+            userModel.findOne({email}, {
+                "email": 1,
+                "nickname": 1,
+                "sex": 1,
+                "desc": 1,
+                "location": 1
+            }).exec((error, doc) => {
+                if (error) {
+                    callback(error)
+                }
+                else if (doc === null) {
+                    callback(new Error("无此用户"))
+                }
+                else callback(null, doc)
+            })
+        }
+    ], (err, result) => {
+        if (err) {
+            res.send({
+                status: false,
+                msg: err.message
+            })
+        }
+        else {
+            res.send({
+                status: true,
+                msg: "返回个人资料",
+                data: result
+            })
+        }
+    })
+})
+//重置个人资料
+router.post('/resetProfile', (req, res) => {
+    let data = req.body || {}
+    //console.log(data)
+    if (req.session.logged === true) {
         async.waterfall([
             (callback) => {
                 let status = true
                 if (!data.hasOwnProperty('nickname')) {
+                    status = false
+                }
+                if (!data.hasOwnProperty('desc')) {
+                    status = false
+                }
+                if (!data.hasOwnProperty('location')) {
+                    status = false
+                }
+                if (!data.hasOwnProperty('sex')) {
                     status = false
                 }
                 if (status) {
@@ -424,7 +481,14 @@ router.post('/resetNickname', (req, res) => {
                 }
             },
             (callback) => {
-                userModel.update({email: req.session.email}, {$set: {nickname: data.nickname}}).exec((err, doc) => {
+                userModel.update({email: req.session.email}, {
+                    $set: {
+                        nickname: data.nickname,
+                        desc:data.desc,
+                        location:data.location,
+                        sex:data.sex
+                    }
+                }).exec((err, doc) => {
                     if (err) {
                         callback(err)
                     }
@@ -457,5 +521,10 @@ router.post('/resetNickname', (req, res) => {
         })
     }
 })
+//修改头像
+router.post('/resetAvatar', (req, res) => {
+
+})
+
 
 module.exports = router
