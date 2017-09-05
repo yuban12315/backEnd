@@ -523,7 +523,31 @@ router.post('/resetProfile', (req, res) => {
 })
 //修改头像
 router.post('/resetAvatar', (req, res) => {
+    let data = req.body || {}
+    //console.log(data)
+    if (req.session.logged === true) {
+        async.waterfall([
 
+        ], (err) => {
+            if (err) {
+                res.send({
+                    status: false,
+                    msg: err.message
+                })
+            }
+            else {
+                res.send({
+                    status: true,
+                    msg: "修改密码成功"
+                })
+            }
+        })
+    } else {
+        res.send({
+            status: false,
+            msg: "请先登录"
+        })
+    }
 })
 
 
