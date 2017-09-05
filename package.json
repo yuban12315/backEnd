@@ -21,6 +21,7 @@
     "nodemailer": "^4.0.1",
     "serve-favicon": "~2.4.2",
     "superagent": "^3.5.2",
+    "superagent-charset": "^1.2.0",
     "tracer": "^0.8.9",
     "uuid": "^3.1.0"
   }

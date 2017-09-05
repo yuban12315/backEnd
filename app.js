@@ -9,6 +9,8 @@ let bodyParser = require('body-parser');
 
 let index = require('./libs/controllers/index');
 let users = require('./libs/controllers/users');
+let museum=require('./libs/controllers/museum')
+let memory=require('./libs/controllers/memory')
 
 let config = require('./libs/config')
 let app = express();
@@ -41,6 +43,8 @@ app.all('*', function (req, res, next) {
 
 app.use('/', index);
 app.use('/users', users);
+app.use('/memory')
+app.use('/museum')
 
 // catch 404 and forward to error handler
 app.use(function (req, res, next) {

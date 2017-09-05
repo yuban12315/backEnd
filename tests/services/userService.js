@@ -1,19 +1,6 @@
+let userService=require('./../../libs/services/userService')
 
-class userService {
-
-    constructor() {
-
-    }
-
-    login(){
-
-    }
-
-    register(data,callback){
-        //async
-    }
-
-
-
-
-}
+userService.getAddress('183.175.12.157',(err,res)=>{
+    if (err)console.log(err)
+    if (res)console.log(res)
+})

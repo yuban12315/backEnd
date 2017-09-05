@@ -1,5 +1,6 @@
 let express = require('express')
 let mailer = require('./../services/mailService')
+let user=require('./../services/userService')
 let uuid = require('uuid/v1')
 let async = require('async')
 let md5 = require('crypto').createHash('md5')
@@ -9,7 +10,7 @@ let console = require('tracer').console()
 
 /* GET users listing. */
 router.get('/', function (req, res, next) {
-    res.send('respond with a resource')
+    res.send('respond with a resource:'+req.ip)
 })
 //获取注册时验证码
 router.post('/getVcode', (req, res) => {

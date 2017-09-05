@@ -7,7 +7,8 @@ let userSchema = new mongoose.Schema({
     },
     email: {
         type: String,
-        required: true
+        required: true,
+        index:true
     },
     password: {
         type: String,
@@ -16,6 +17,10 @@ let userSchema = new mongoose.Schema({
     _salt:{
         type:String,
         required:true
+    },
+    location:{
+        province:String,
+        city:String
     }
 
 })
