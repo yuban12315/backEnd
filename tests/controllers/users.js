@@ -49,9 +49,41 @@ let url = 'http://127.0.0.1:3000/users'
 //     if (err) console.log(err)
 //     if (res) console.log(res.text)
 // })
-request.post(url + '/resetNickname', {
-    nickname: "admin1"
-}).end((err, res) => {
-    if (err) console.log(err)
-    if (res) console.log(res.text)
+// request.post(url + '/resetNickname', {
+//     nickname: "admin1"
+// }).end((err, res) => {
+//     if (err) console.log(err)
+//     if (res) console.log(res.text)
+// })
+let cookie=[ 'connect.sid=s%3AT2W0x84KlRQodrd-aPyEvm0ie_nVPcLb.XJGHSQWHv2j8JS2FdRvXkAb9R557A759fTAgv4Exm6M; Path=/; HttpOnly' ]
+async.waterfall([
+    //登录
+    // (callback) => {
+    //     request.post(url + '/login', {
+    //         email: "455678228@qq.com",
+    //         password: "123456"
+    //     }).end((err, res) => {
+    //         if (err) {
+    //             callback(err)
+    //         }
+    //         else {
+    //             cookie = res.header["set-cookie"]
+    //             console.log(cookie)
+    //             callback(null)
+    //         }
+    //     })
+    // },
+    (callback) => {
+        request.get(url + '/getProfile').set("Cookie", cookie).end((err, res) => {
+            if (err) {
+                callback(err)
+            }
+            else {
+                callback(null, res.text)
+            }
+        })
+    }
+], (err, res) => {
+    if (err) console.log(err.message)
+    if (res) console.log(res)
 })

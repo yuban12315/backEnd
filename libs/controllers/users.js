@@ -257,7 +257,7 @@ router.post('/login', (req, res) => {
     }
 })
 //获取登录状态
-router.get('checkLogin', (req, res) => {
+router.get('/checkLogin', (req, res) => {
     res.send({
         logged: !!req.session.logged
     })
@@ -421,7 +421,7 @@ router.post('/resetPassword', (req, res) => {
 router.get('/getProfile', (req, res) => {
     async.waterfall([
         (callback) => {
-            let email = req.query.email
+            let email = req.query.email||req.session.email
             userModel.findOne({email}, {
                 "email": 1,
                 "nickname": 1,
