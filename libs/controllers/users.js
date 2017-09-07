@@ -155,7 +155,7 @@ router.post('/register', (req, res) => {
             })
         },
         //用户信息存入数据库
-        (callback, location) => {
+        (location,callback) => {
             data._salt = uuid().toString().substring(0, 8)
             data.location = location
             data.password = userService.secret(data.password,data._salt)
