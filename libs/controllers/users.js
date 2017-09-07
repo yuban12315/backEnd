@@ -1,6 +1,6 @@
 let express = require('express')
 let mailer = require('./../services/mailService')
-let user = require('./../services/userService')
+let userService= require('./../services/userService')
 let uuid = require('uuid/v1')
 let async = require('async')
 let md5 = require('crypto').createHash('md5')
@@ -145,7 +145,7 @@ router.post('/register', (req, res) => {
         },
         //获取位置
         (callback) => {
-            user.getAddress(req.ip, (err, loc) => {
+            userService.getAddress(req.ip, (err, loc) => {
                 if (err) {
                     callback(err)
                 }
@@ -158,7 +158,7 @@ router.post('/register', (req, res) => {
         (callback, location) => {
             data._salt = uuid().toString().substring(0, 8)
             data.location = location
-            data.password = user.secret(data.password,data._salt)
+            data.password = userService.secret(data.password,data._salt)
             let user = new userModel(data)
             user.save((err, docs) => {
                 if (err) {
@@ -229,7 +229,7 @@ router.post('/login', (req, res) => {
                         if (docs === null) {
                             callback(new Error("用户不存在"))
                         } else  {
-                            let password=user.secret(data.password,docs._salt)
+                            let password=userService.secret(data.password,docs._salt)
                             if (password!==docs.password){
                                 callback(new Error("密码错误"))
                             }
@@ -392,7 +392,7 @@ router.post('/resetPassword', (req, res) => {
         },
         //修改数据库内密码
         (_salt, callback) => {
-            let password = user.secret(data.password,_salt)
+            let password = userService.secret(data.password,_salt)
             userModel.update({email: data.email}, {$set: {password: password}}).exec((err, doc) => {
                 if (err) {
                     callback(err)
