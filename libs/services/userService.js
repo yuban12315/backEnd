@@ -1,5 +1,6 @@
 let async = require('async')
 let request = require('superagent-charset')(require('superagent'))
+let crypto=require('crypto')
 
 class userService {
     constructor() {
@@ -25,6 +26,13 @@ class userService {
 
         testString = testString.substring(testString.indexOf('{'), testString.indexOf(';'))
 
+    }
+
+    secret(password,salt){
+        //docs.password != md5.update(data.password + docs._salt).digest('hex')
+        let md5 = crypto.createHash('md5')
+        let t=md5.update(password+salt)
+        return md5.digest('hex')
     }
 }
 

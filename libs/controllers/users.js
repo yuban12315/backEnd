@@ -158,7 +158,7 @@ router.post('/register', (req, res) => {
         (callback, location) => {
             data._salt = uuid().toString().substring(0, 8)
             data.location = location
-            data.password = md5.update(data.password + data._salt).digest('hex');
+            data.password = user.secret(data.password,data._salt)
             let user = new userModel(data)
             user.save((err, docs) => {
                 if (err) {
@@ -226,14 +226,17 @@ router.post('/login', (req, res) => {
                         callback(err)
                     }
                     else {
-                        if (docs == null) {
+                        if (docs === null) {
                             callback(new Error("用户不存在"))
-                        } else if (docs.password != md5.update(data.password + docs._salt).digest('hex')) {
+                        } else  {
+                            let password=user.secret(data.password,docs._salt)
+                            if (password!==docs.password){
+                                callback(new Error("密码错误"))
+                            }
+                            else {
+                                callback(null)
+                            }
                             //data.password = md5.update(data.password).digest('hex');
-                            callback(new Error("密码错误"))
-                        }
-                        else {
-                            callback(null)
                         }
                     }
                 })
@@ -355,10 +358,10 @@ router.post('/resetPassword', (req, res) => {
                     status = false
                 }
             }
-            if (!data.hasOwnProperty('vcode')) {
+            if (!data.hasOwnProperty('vcode2')) {
                 status = false
             } else {
-                if (data.vcode.length != 6) {
+                if (data.vcode2.length != 6) {
                     status = false
                 }
             }
@@ -389,7 +392,7 @@ router.post('/resetPassword', (req, res) => {
         },
         //修改数据库内密码
         (_salt, callback) => {
-            let password = md5.update(data.password + _salt).digest('hex');
+            let password = user.secret(data.password,_salt)
             userModel.update({email: data.email}, {$set: {password: password}}).exec((err, doc) => {
                 if (err) {
                     callback(err)
