@@ -430,7 +430,8 @@ router.get('/getProfile', (req, res) => {
                 "nickname": 1,
                 "sex": 1,
                 "desc": 1,
-                "location": 1
+                "location": 1,
+                "avatar":1
             }).exec((error, doc) => {
                 if (error) {
                     callback(error)
