@@ -1,19 +1,20 @@
 let express = require('express'),
     mailer = require('./../services/mailService'),
-    userService= require('./../services/userService'),
+    userService = require('./../services/userService'),
     uuid = require('uuid/v1'),
     async = require('async'),
     md5 = require('crypto').createHash('md5'),
     userModel = require('./../dbs/models/userModel'),
     router = express.Router(),
     console = require('tracer').console(),
-    upload=require('./../utils/avatarUpload'),
-    fileService=require('./../services/fileService')
+    upload = require('./../utils/avatarUpload'),
+    fileService = require('./../services/fileService')
 
 /* GET users listing. */
 router.get('/', function (req, res, next) {
     res.send('respond with a resource:' + req.ip)
 })
+
 //获取注册时验证码
 router.post('/getVcode', (req, res) => {
     let mailAdress = req.body.mailTo || null
@@ -77,6 +78,7 @@ router.post('/getVcode', (req, res) => {
         })
     }
 })
+
 //注册
 router.post('/register', (req, res) => {
     let data = req.body || {}
@@ -157,10 +159,10 @@ router.post('/register', (req, res) => {
             })
         },
         //用户信息存入数据库
-        (location,callback) => {
+        (location, callback) => {
             data._salt = uuid().toString().substring(0, 8)
             data.location = location
-            data.password = userService.secret(data.password,data._salt)
+            data.password = userService.secret(data.password, data._salt)
             let user = new userModel(data)
             user.save((err, docs) => {
                 if (err) {
@@ -186,6 +188,7 @@ router.post('/register', (req, res) => {
         }
     })
 })
+
 //登录
 router.post('/login', (req, res) => {
     //判断是否已经登录
@@ -230,9 +233,9 @@ router.post('/login', (req, res) => {
                     else {
                         if (docs === null) {
                             callback(new Error("用户不存在"))
-                        } else  {
-                            let password=userService.secret(data.password,docs._salt)
-                            if (password!==docs.password){
+                        } else {
+                            let password = userService.secret(data.password, docs._salt)
+                            if (password !== docs.password) {
                                 callback(new Error("密码错误"))
                             }
                             else {
@@ -261,12 +264,14 @@ router.post('/login', (req, res) => {
         })
     }
 })
+
 //获取登录状态
 router.get('/checkLogin', (req, res) => {
     res.send({
         logged: !!req.session.logged
     })
 })
+
 //退出登录
 router.get('/logout', (req, res) => {
     if (req.session.logged) {
@@ -277,6 +282,7 @@ router.get('/logout', (req, res) => {
         msg: "退出登录成功"
     })
 })
+
 //获取重置密码时验证码
 router.post('/getVcode2', (req, res) => {
     let mailAdress = req.body.mailTo || null
@@ -339,6 +345,7 @@ router.post('/getVcode2', (req, res) => {
         })
     }
 })
+
 //重置密码
 router.post('/resetPassword', (req, res) => {
     let data = req.body || {}
@@ -394,7 +401,7 @@ router.post('/resetPassword', (req, res) => {
         },
         //修改数据库内密码
         (_salt, callback) => {
-            let password = userService.secret(data.password,_salt)
+            let password = userService.secret(data.password, _salt)
             userModel.update({email: data.email}, {$set: {password: password}}).exec((err, doc) => {
                 if (err) {
                     callback(err)
@@ -422,18 +429,19 @@ router.post('/resetPassword', (req, res) => {
         }
     })
 })
+
 //获取个人资料
 router.get('/getProfile', (req, res) => {
     async.waterfall([
         (callback) => {
-            let email = req.query.email||req.session.email
+            let email = req.query.email || req.session.email
             userModel.findOne({email}, {
                 "email": 1,
                 "nickname": 1,
                 "sex": 1,
                 "desc": 1,
                 "location": 1,
-                "avatar":1
+                "avatar": 1
             }).exec((error, doc) => {
                 if (error) {
                     callback(error)
@@ -460,6 +468,7 @@ router.get('/getProfile', (req, res) => {
         }
     })
 })
+
 //重置个人资料
 router.post('/resetProfile', (req, res) => {
     let data = req.body || {}
@@ -490,9 +499,9 @@ router.post('/resetProfile', (req, res) => {
                 userModel.update({email: req.session.email}, {
                     $set: {
                         nickname: data.nickname,
-                        desc:data.desc,
-                        location:data.location,
-                        sex:data.sex
+                        desc: data.desc,
+                        location: data.location,
+                        sex: data.sex
                     }
                 }).exec((err, doc) => {
                     if (err) {
@@ -527,30 +536,33 @@ router.post('/resetProfile', (req, res) => {
         })
     }
 })
+
 //修改头像
-router.post('/resetAvatar',upload.single("avatar"), (req, res) => {
+router.post('/resetAvatar', upload.single("avatar"), (req, res) => {
     let data = req.body || {}
     //console.log(data)
     if (req.session.logged === true) {
         //console.log(req.file.buffer)
         async.waterfall([
             //头像文件上传七牛云
-            (callback)=>{
-                let filename=req.file.filename
+            (callback) => {
+                let filename = req.file.filename
                 //console.log(filename)
-                fileService.upload(filename,(error, response)=>{
-                    if (error){
+                fileService.upload(filename, (error, response) => {
+                    if (error) {
                         callback(error)
                     }
                     else {
                         console.log(response)
-                        callback(null,response.key)
+                        callback(null, response.key)
                     }
                 })
             },
             //修改的头像存数据库
-            (avatar, callback)=>{
-                userModel.update({email:req.session.email},{$set:{avatar}}).exec((err, doc) => {
+            (avatar, callback) => {
+                userModel.update({email: req.session.email}, {
+                    $set: {avatar: "http://ocxi5zst0.bkt.clouddn.com/" + avatar}
+                }).exec((err, doc) => {
                     if (err) {
                         callback(err)
                     }
@@ -558,11 +570,11 @@ router.post('/resetAvatar',upload.single("avatar"), (req, res) => {
                         callback(new Error("修改头像失败"))
                     }
                     else {
-                        callback(null,avatar)
+                        callback(null, avatar)
                     }
                 })
             }
-        ], (err,avatar) => {
+        ], (err, avatar) => {
             if (err) {
                 res.send({
                     status: false,

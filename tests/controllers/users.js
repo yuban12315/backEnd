@@ -80,23 +80,23 @@ async.waterfall([
     // },
 
     //获取资料
-    // (callback) => {
-    //     request.get(url + '/getProfile').set("Cookie", cookie).end((err, res) => {
-    //         if (err) {
-    //             callback(err)
-    //         }
-    //         else {
-    //             callback(null, res.text)
-    //         }
-    //     })
-    // }
-
-    //修改头像
-    (callback)=>{
-    request.post(url+'/resetAvatar').set("Cookie",cookie).field("name","avatar").attach('avatar','homura.jpg').end((err,res)=>{
-        callback(err,res)
+    (callback) => {
+        request.get(url + '/getProfile').set("Cookie", cookie).end((err, res) => {
+            if (err) {
+                callback(err)
+            }
+            else {
+                callback(null, res)
+            }
         })
     }
+
+    //修改头像
+    // (callback)=>{
+    // request.post(url+'/resetAvatar').set("Cookie",cookie).field("name","avatar").attach('avatar','homura.jpg').end((err,res)=>{
+    //     callback(err,res)
+    //     })
+    // }
 ], (err, res) => {
     if (err) console.log(err.message)
     if (res) console.log(res.text)
