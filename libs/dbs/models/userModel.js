@@ -28,7 +28,6 @@ let userSchema = new mongoose.Schema({
         type:String,
         default:"http://ocxi5zst0.bkt.clouddn.com/5657474daecbe02.jpg"
     }
-
 })
 
 let userModel = mongoose.model('user', userSchema)

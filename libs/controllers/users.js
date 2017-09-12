@@ -1,12 +1,14 @@
-let express = require('express')
-let mailer = require('./../services/mailService')
-let userService= require('./../services/userService')
-let uuid = require('uuid/v1')
-let async = require('async')
-let md5 = require('crypto').createHash('md5')
-let userModel = require('./../dbs/models/userModel')
-let router = express.Router()
-let console = require('tracer').console()
+let express = require('express'),
+    mailer = require('./../services/mailService'),
+    userService= require('./../services/userService'),
+    uuid = require('uuid/v1'),
+    async = require('async'),
+    md5 = require('crypto').createHash('md5'),
+    userModel = require('./../dbs/models/userModel'),
+    router = express.Router(),
+    console = require('tracer').console(),
+    upload=require('./../utils/avatarUpload'),
+    fileService=require('./../services/fileService')
 
 /* GET users listing. */
 router.get('/', function (req, res, next) {
@@ -526,13 +528,41 @@ router.post('/resetProfile', (req, res) => {
     }
 })
 //修改头像
-router.post('/resetAvatar', (req, res) => {
+router.post('/resetAvatar',upload.single("avatar"), (req, res) => {
     let data = req.body || {}
     //console.log(data)
     if (req.session.logged === true) {
+        //console.log(req.file.buffer)
         async.waterfall([
-
-        ], (err) => {
+            //头像文件上传七牛云
+            (callback)=>{
+                let filename=req.file.filename
+                //console.log(filename)
+                fileService.upload(filename,(error, response)=>{
+                    if (error){
+                        callback(error)
+                    }
+                    else {
+                        console.log(response)
+                        callback(null,response.key)
+                    }
+                })
+            },
+            //修改的头像存数据库
+            (avatar, callback)=>{
+                userModel.update({email:req.session.email},{$set:{avatar}}).exec((err, doc) => {
+                    if (err) {
+                        callback(err)
+                    }
+                    else if (doc.nModified != 1) {
+                        callback(new Error("修改头像失败"))
+                    }
+                    else {
+                        callback(null,avatar)
+                    }
+                })
+            }
+        ], (err,avatar) => {
             if (err) {
                 res.send({
                     status: false,
@@ -542,7 +572,8 @@ router.post('/resetAvatar', (req, res) => {
             else {
                 res.send({
                     status: true,
-                    msg: "修改密码成功"
+                    msg: "修改头像成功",
+                    avatar
                 })
             }
         })

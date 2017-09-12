@@ -2,6 +2,9 @@ let request = require('superagent')
 let async = require('async')
 let url = 'http://127.0.0.1:3000/users'
 
+/**
+ * 注册新用户*/
+
 // request.post('http://127.0.0.1:3000/users/getVcode2',{
 //     mailTo:'misaka12315@gmail.com'
 // }).end((err,res)=>{
@@ -56,25 +59,26 @@ let url = 'http://127.0.0.1:3000/users'
 //     if (res) console.log(res.text)
 // })
 let cookie
-// cookie=[ 'connect.sid=s%3AT2W0x84KlRQodrd-aPyEvm0ie_nVPcLb.XJGHSQWHv2j8JS2FdRvXkAb9R557A759fTAgv4Exm6M; Path=/; HttpOnly' ]
+cookie=[ 'connect.sid=s%3A41tN6fl8X9PHBOsgGTP-6IG6bW8MIQEA.bIkrH4C6pAbleorDnw6MBd0euNeudKbzU0kzIDM3gQU; Path=/; HttpOnly' ]
 async.waterfall([
     //登录
-    (callback) => {
-        request.post(url + '/login', {
-            email: "455678228@qq.com",
-            password: "123456"
-        }).end((err, res) => {
-            if (err) {
-                callback(err)
-            }
-            else {
-                cookie = res.header["set-cookie"]
-                console.log(cookie)
-                console.log(res.text)
-                callback(null)
-            }
-        })
-    },
+    // (callback) => {
+    //     request.post(url + '/login', {
+    //         email: "455678228@qq.com",
+    //         password: "123456"
+    //     }).end((err, res) => {
+    //         if (err) {
+    //             callback(err)
+    //         }
+    //         else {
+    //             cookie = res.header["set-cookie"]
+    //             //console.log(cookie)
+    //             console.log(res.text)
+    //             callback(null)
+    //         }
+    //     })
+    // },
+
     //获取资料
     // (callback) => {
     //     request.get(url + '/getProfile').set("Cookie", cookie).end((err, res) => {
@@ -86,7 +90,20 @@ async.waterfall([
     //         }
     //     })
     // }
+
+    //修改头像
+    (callback)=>{
+    request.post(url+'/resetAvatar').set("Cookie",cookie).field("name","avatar").attach('avatar','homura.jpg').end((err,res)=>{
+        callback(err,res)
+        })
+    }
 ], (err, res) => {
     if (err) console.log(err.message)
-    if (res) console.log(res)
+    if (res) console.log(res.text)
 })
+
+// let fs = require('fs')
+// fs.readFile('homura.jpg', (error, buffer) => {
+//     if (error) console.log(error)
+//     console.log(buffer)
+// })

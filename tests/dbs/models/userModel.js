@@ -29,13 +29,18 @@ password=md5.update(password+salt).digest('hex');
 //     }
 // })
 
-// let user=new userModel({
-//     nickname:"admin",
-//     password:password,
-//     email:"455678228@qq.com",
-//     _salt:salt
-// })
-// user.save((err,docs)=>{
-//     if (err)console.log(err)
-//     if (docs)console.log(docs)
-// })
+let user=new userModel({
+    nickname:"admin",
+    password:password,
+    email:"455678228@qq.com",
+    desc:'null',
+    location:{
+        province:"内蒙古",
+        city:"呼和浩特"
+    },
+    _salt:salt
+})
+user.save((err,docs)=>{
+    if (err)console.log(err)
+    if (docs)console.log(docs)
+})
