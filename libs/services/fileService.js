@@ -7,13 +7,13 @@ class fileService {
         storage.conf.ACCESS_KEY = config.qiniuConfig.ACCESS_KEY
         storage.conf.SECRET_KEY = config.qiniuConfig.SECRET_KEY
 
+        //七牛空间地址
         this.bucket = 'project-eden'
     }
 
     upload(filename, callback) {
         this.uploadFile(filename, './uploads/' + filename, callback)
     }
-
 
     //内部方法
     uploadFile(key, file_path, callback) {
@@ -28,7 +28,7 @@ class fileService {
             }
             else {
                 //上传完成后删除原图片
-                //this.deleteFile(file_path)
+                this.deleteFile(file_path)
                 //console.log(res.hash,res.key.res.persistentId)
                 callback(null, res)
             }

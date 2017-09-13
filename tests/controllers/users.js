@@ -80,16 +80,16 @@ async.waterfall([
     // },
 
     //获取资料
-    (callback) => {
-        request.get(url + '/getProfile').set("Cookie", cookie).end((err, res) => {
-            if (err) {
-                callback(err)
-            }
-            else {
-                callback(null, res)
-            }
-        })
-    }
+    // (callback) => {
+    //     request.get(url + '/getProfile').set("Cookie", cookie).end((err, res) => {
+    //         if (err) {
+    //             callback(err)
+    //         }
+    //         else {
+    //             callback(null, res)
+    //         }
+    //     })
+    // }
 
     //修改头像
     // (callback)=>{
@@ -97,6 +97,14 @@ async.waterfall([
     //     callback(err,res)
     //     })
     // }
+
+    (callback)=>{
+        request.post(url+'/testFile').field("name","avatar").attach("avatar","homura.jpg").end((error, response)=>{
+            callback(error,response)
+        })
+    }
+
+
 ], (err, res) => {
     if (err) console.log(err.message)
     if (res) console.log(res.text)

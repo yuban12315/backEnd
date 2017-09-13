@@ -10,7 +10,6 @@ let express = require('express'),
     upload = require('./../utils/avatarUpload'),
     fileService = require('./../services/fileService')
 
-/* GET users listing. */
 router.get('/', function (req, res, next) {
     res.send('respond with a resource:' + req.ip)
 })
@@ -597,5 +596,16 @@ router.post('/resetAvatar', upload.single("avatar"), (req, res) => {
     }
 })
 
+//test
+router.post('/testFile',upload.single("avatar"),(req,res)=>{
+    let data = req.body || {}
+    console.log(data)
+    console.log(req.file)
+    let filename=req.file.filename
+
+    res.send({
+        file:req.file
+    })
+})
 
 module.exports = router
