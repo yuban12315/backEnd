@@ -604,7 +604,8 @@ router.post('/testFile',upload.single("avatar"),(req,res)=>{
     let filename=req.file.filename
 
     res.send({
-        file:req.file
+        file:req.file,
+        data:req.body
     })
 })
 
