@@ -1,18 +1,21 @@
 let async = require('async')
 let request = require('superagent-charset')(require('superagent'))
 let crypto=require('crypto')
+let console=require("tracer").console()
 
 class userService {
     constructor() {
 
     }
 
+    //获取地址
     getAddress(ip, callback) {
         /*默认返回服务器地址*/
         request.get("http://int.dpool.sina.com.cn/iplookup/iplookup.php?format=js&ip=" + ip).charset('utf-8').end((err, res) => {
             if (err || !res.hasOwnProperty('text')) {
                 callback(err)
             } else {
+
                 let data=JSON.parse(res.text.substring(res.text.indexOf('{'),res.text.indexOf(';')))
                 data={
                     country:data.country,
@@ -28,6 +31,7 @@ class userService {
 
     }
 
+    //加密
     secret(password,salt){
         //docs.password != md5.update(data.password + docs._salt).digest('hex')
         let md5 = crypto.createHash('md5')

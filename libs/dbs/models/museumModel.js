@@ -4,6 +4,9 @@ let museumSchema = mongoose.Schema({
         type: String,
         required: true
     },
+    image:{
+        type:String
+    },
     startTime: {
         type: Date
     },
@@ -21,6 +24,12 @@ let museumSchema = mongoose.Schema({
         },
         //详细地址
         loc: String
+    },
+    admin:{
+        email:{
+            type:String,
+            default:"455678228@qq.com"
+        }
     }
 })
 

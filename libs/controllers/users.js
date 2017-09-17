@@ -547,15 +547,19 @@ router.post('/resetAvatar', upload.single("avatar"), (req, res) => {
             (callback) => {
                 let filename = req.file.filename
                 //console.log(filename)
-                fileService.upload(filename, (error, response) => {
-                    if (error) {
-                        callback(error)
-                    }
-                    else {
-                        console.log(response)
-                        callback(null, response.key)
-                    }
-                })
+                if (!filename) {
+                    callback(new Error("未获取到文件"))
+                } else {
+                    fileService.upload(filename, (error, response) => {
+                        if (error) {
+                            callback(error)
+                        }
+                        else {
+                            //console.log(response)
+                            callback(null, response.key)
+                        }
+                    })
+                }
             },
             //修改的头像存数据库
             (avatar, callback) => {
@@ -597,15 +601,15 @@ router.post('/resetAvatar', upload.single("avatar"), (req, res) => {
 })
 
 //test
-router.post('/testFile',upload.single("avatar"),(req,res)=>{
+router.post('/testFile', upload.single("avatar"), (req, res) => {
     let data = req.body || {}
     console.log(data)
     console.log(req.file)
-    let filename=req.file.filename
+    let filename = req.file.filename
 
     res.send({
-        file:req.file,
-        data:req.body
+        file: req.file,
+        data: req.body
     })
 })
 
