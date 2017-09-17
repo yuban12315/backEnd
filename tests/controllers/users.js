@@ -98,9 +98,20 @@ async.waterfall([
     //     })
     // }
 
+    //修改资料
     (callback)=>{
-        request.post(url+'/testFile').field("name","avatar").attach("avatar","homura.jpg").end((error, response)=>{
-            callback(error,response)
+        request.post(url+'/resetProfile').set("Cookie",cookie).send({
+            nickname: "admin",
+            desc: "123456",
+            location: {
+                province:"四川",
+                city:"成都"
+            },
+            sex: "男"
+        }).end((error,res)=>{
+            if(res){
+                console.log(res.text)
+            }
         })
     }
 
