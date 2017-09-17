@@ -603,8 +603,8 @@ router.post('/resetAvatar', upload.single("avatar"), (req, res) => {
 //test
 router.post('/testFile', upload.single("avatar"), (req, res) => {
     let data = req.body || {}
-    console.log("data:"+data)
-    console.log("filename:"+req.file.filename)
+    console.log(data||"data = null")
+    console.log(req.file||"file = null")
     let filename = req.file.filename
 
     res.send({
