@@ -524,7 +524,7 @@ router.post('/resetProfile', (req, res) => {
             else {
                 res.send({
                     status: true,
-                    msg: "修改密码成功"
+                    msg: "修改资料成功"
                 })
             }
         })
@@ -605,7 +605,7 @@ router.post('/testFile', upload.single("avatar"), (req, res) => {
     let data = req.body || {}
     console.log(data||"data = null")
     console.log(req.file||"file = null")
-    let filename = req.file.filename
+    //let filename = req.file.filename
 
     res.send({
         file: req.file,
