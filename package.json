@@ -4,9 +4,7 @@
   "private": true,
   "scripts": {
     "start": "node ./bin/www",
-    "debug": "supervisor ./bin/www",
-    "forever": "forever -p . -l ./logs/log -a  start ./bin/www",
-    "stop": "forever stop ./bin/www"
+    "debug": "supervisor ./bin/www"
   },
   "dependencies": {
     "async": "^2.5.0",

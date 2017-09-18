@@ -1,2 +1,3 @@
-let bool=/\.(gif|jpg|jpeg|png|GIF|JPG|PNG)/.test("1.jpg")
-console.log(bool)
+let a="-2"
+a.substring(a.indexOf('{'),a.indexOf(';'))
+console.log(a.includes("{"))

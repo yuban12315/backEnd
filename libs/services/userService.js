@@ -15,10 +15,11 @@ class userService {
             if (err || !res.hasOwnProperty('text')) {
                 callback(err)
             } else {
-                if (res.text!=="-1"){
-                    let data=JSON.parse(res.text.substring(res.text.indexOf('{'),res.text.indexOf(';')))
+                let text=res.text.substring(res.text.indexOf('{'),res.text.indexOf(';'))
+                console.log(text)
+                if (text.includes("{")){
+                    let data=JSON.parse(text)
                     data={
-                        country:data.country,
                         province:data.province,
                         city:data.city
                     }
@@ -27,7 +28,6 @@ class userService {
                 else {
                     callback(new Error("获取地址失败"))
                 }
-
             }
         })
         let testString = `var remote_ip_info = {"ret":1,"start":-1,"end":-1,"country":"\u4e2d\u56fd","province":"\u5185\u8499\u53e4","city":"\u547c\u548c\u6d69\u7279","district":"","isp":"","type":"","desc":""};`

@@ -59,25 +59,25 @@ let url = 'http://127.0.0.1:3000/users'
 //     if (res) console.log(res.text)
 // })
 let cookie
-cookie=[ 'connect.sid=s%3A41tN6fl8X9PHBOsgGTP-6IG6bW8MIQEA.bIkrH4C6pAbleorDnw6MBd0euNeudKbzU0kzIDM3gQU; Path=/; HttpOnly' ]
+//cookie=[ 'connect.sid=s%3A41tN6fl8X9PHBOsgGTP-6IG6bW8MIQEA.bIkrH4C6pAbleorDnw6MBd0euNeudKbzU0kzIDM3gQU; Path=/; HttpOnly' ]
 async.waterfall([
     //登录
-    // (callback) => {
-    //     request.post(url + '/login', {
-    //         email: "455678228@qq.com",
-    //         password: "123456"
-    //     }).end((err, res) => {
-    //         if (err) {
-    //             callback(err)
-    //         }
-    //         else {
-    //             cookie = res.header["set-cookie"]
-    //             //console.log(cookie)
-    //             console.log(res.text)
-    //             callback(null)
-    //         }
-    //     })
-    // },
+    (callback) => {
+        request.post(url + '/login', {
+            email: "455678228@qq.com",
+            password: "123456"
+        }).end((err, res) => {
+            if (err) {
+                callback(err)
+            }
+            else {
+                cookie = res.header["set-cookie"]
+                //console.log(cookie)
+                console.log(res.text)
+                callback(null)
+            }
+        })
+    },
 
     //获取资料
     // (callback) => {
@@ -99,21 +99,21 @@ async.waterfall([
     // }
 
     //修改资料
-    (callback)=>{
-        request.post(url+'/resetProfile').set("Cookie",cookie).send({
-            nickname: "admin",
-            desc: "123456",
-            location: {
-                province:"四川",
-                city:"成都"
-            },
-            sex: "男"
-        }).end((error,res)=>{
-            if(res){
-                console.log(res.text)
-            }
-        })
-    }
+    // (callback)=>{
+    //     request.post(url+'/resetProfile').set("Cookie",cookie).send({
+    //         nickname: "admin",
+    //         desc: "123456",
+    //         location: {
+    //             province:"四川",
+    //             city:"成都"
+    //         },
+    //         sex: "男"
+    //     }).end((error,res)=>{
+    //         if(res){
+    //             console.log(res.text)
+    //         }
+    //     })
+    // }
 
 
 ], (err, res) => {
