@@ -229,7 +229,7 @@ router.post('/login', (req, res) => {
             },
             //登录并修改地址
             (location, callback) => {
-                userModel.findOne({email: data.email}, {$set: {l}}).exec((err, docs) => {
+                userModel.findOne({email: data.email}, {$set: {location:location}}).exec((err, docs) => {
                     if (err) {
                         callback(err)
                     }

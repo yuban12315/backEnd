@@ -1,1 +1,59 @@
-1
+Mon, 18 Sep 2017 11:34:31 GMT express-session deprecated undefined resave option; provide resave option at app.js:28:9
+Mon, 18 Sep 2017 11:34:31 GMT express-session deprecated undefined saveUninitialized option; provide saveUninitialized option at app.js:28:9
+
+D:\code\js\backEnd\node_modules\mongodb\lib\mongo_client.js:377
+          throw err
+          ^
+MongoError: failed to connect to server [123.207.157.229:27017] on first connect [MongoError: connect ETIMEDOUT 123.207.157.229:27017]
+    at Pool.<anonymous> (D:\code\js\backEnd\node_modules\mongodb-core\lib\topologies\server.js:328:35)
+    at emitOne (events.js:115:13)
+    at Pool.emit (events.js:210:7)
+    at Connection.<anonymous> (D:\code\js\backEnd\node_modules\mongodb-core\lib\connection\pool.js:280:12)
+    at Object.onceWrapper (events.js:318:30)
+    at emitTwo (events.js:125:13)
+    at Connection.emit (events.js:213:7)
+    at Socket.<anonymous> (D:\code\js\backEnd\node_modules\mongodb-core\lib\connection\connection.js:177:49)
+    at Object.onceWrapper (events.js:316:30)
+    at emitOne (events.js:115:13)
+    at Socket.emit (events.js:210:7)
+    at emitErrorNT (internal/streams/destroy.js:64:8)
+    at _combinedTickCallback (internal/process/next_tick.js:138:11)
+    at process._tickCallback (internal/process/next_tick.js:180:9)
+error: Forever detected script exited with code: 1
+error: Script restart attempt #1
+Mon, 18 Sep 2017 11:34:53 GMT express-session deprecated undefined resave option; provide resave option at app.js:28:9
+Mon, 18 Sep 2017 11:34:53 GMT express-session deprecated undefined saveUninitialized option; provide saveUninitialized option at app.js:28:9
+(node:13144) UnhandledPromiseRejectionWarning: Unhandled promise rejection (rejection id: 1): MongoError: failed to connect to server [123.207.157.229:27017] on first connect [MongoError: connect ETIMEDOUT 123.207.157.229:27017]
+(node:13144) [DEP0018] DeprecationWarning: Unhandled promise rejections are deprecated. In the future, promise rejections that are not handled will terminate the Node.js process with a non-zero exit code.
+
+D:\code\js\backEnd\node_modules\mongodb\lib\mongo_client.js:377
+          throw err
+          ^
+MongoError: failed to connect to server [123.207.157.229:27017] on first connect [MongoError: connect ETIMEDOUT 123.207.157.229:27017]
+    at Pool.<anonymous> (D:\code\js\backEnd\node_modules\mongodb-core\lib\topologies\server.js:328:35)
+    at emitOne (events.js:115:13)
+    at Pool.emit (events.js:210:7)
+    at Connection.<anonymous> (D:\code\js\backEnd\node_modules\mongodb-core\lib\connection\pool.js:280:12)
+    at Object.onceWrapper (events.js:318:30)
+    at emitTwo (events.js:125:13)
+    at Connection.emit (events.js:213:7)
+    at Socket.<anonymous> (D:\code\js\backEnd\node_modules\mongodb-core\lib\connection\connection.js:177:49)
+    at Object.onceWrapper (events.js:316:30)
+    at emitOne (events.js:115:13)
+    at Socket.emit (events.js:210:7)
+    at emitErrorNT (internal/streams/destroy.js:64:8)
+    at _combinedTickCallback (internal/process/next_tick.js:138:11)
+    at process._tickCallback (internal/process/next_tick.js:180:9)
+error: Forever detected script exited with code: 1
+error: Script restart attempt #2
+Mon, 18 Sep 2017 11:35:15 GMT express-session deprecated undefined resave option; provide resave option at app.js:28:9
+Mon, 18 Sep 2017 11:35:15 GMT express-session deprecated undefined saveUninitialized option; provide saveUninitialized option at app.js:28:9
+(node:16908) [DEP0013] DeprecationWarning: Calling an asynchronous function without callback is deprecated.
+error: Forever detected script exited with code: 1
+Mon, 18 Sep 2017 11:45:16 GMT express-session deprecated undefined resave option; provide resave option at app.js:28:9
+Mon, 18 Sep 2017 11:45:16 GMT express-session deprecated undefined saveUninitialized option; provide saveUninitialized option at app.js:28:9
+[0mGET / [36m304 [0m369.284 ms - -[0m
+[0mGET /stylesheets/style.css [36m304 [0m93.816 ms - -[0m
+[0mGET / [36m304 [0m62.480 ms - -[0m
+[0mGET /stylesheets/style.css [36m304 [0m91.436 ms - -[0m
+[0mGET /users [32m200 [0m44.927 ms - 33[0m

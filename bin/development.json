@@ -3,5 +3,5 @@
   "append":"true",
   "watch":"true",
   "script":"www",
-  "sourceDir":"./bin"
+  "sourceDir":"/bin"
 }
