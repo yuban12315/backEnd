@@ -5,8 +5,8 @@
   "scripts": {
     "start": "node ./bin/www",
     "debug": "supervisor ./bin/www",
-    "forever": "forever start ./bin/www",
-    "stop": "forever stop ./bin/www"
+    "forever": "forever -p . -l ./logs/log -o ./logs/out -e ./logs/err start ./bin/development.json",
+    "stop": "forever stop ./bin/development.json"
   },
   "dependencies": {
     "async": "^2.5.0",

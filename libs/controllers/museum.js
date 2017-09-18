@@ -36,7 +36,7 @@ router.get('/nearBy', (req, res) => {
         //从数据库返回-city
         (location, callback) => {
             console.log(location)
-            museumModel.find({location:{city:location.city}}).exec((error,docs)=>{
+            museumModel.find({"location.city":location.city}).exec((error,docs)=>{
                 if (error){
                     callback(error)
                 }else {
