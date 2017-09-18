@@ -1,6 +1,7 @@
 .idea
 node_modules
 libs/config.js
+logs
 
 uploads
 backEnd.zip
