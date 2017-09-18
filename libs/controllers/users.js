@@ -223,9 +223,14 @@ router.post('/login', (req, res) => {
                     callback(new Error("未通过结构验证"))
                 }
             },
-            //登录
+            //获取地址
             (callback) => {
-                userModel.findOne({email: data.email}).exec((err, docs) => {
+                userService.getAddress(req.ip, (error, response) => callback(error, response))
+            },
+            //登录并修改地址
+            (location, callback) => {
+                if (!location) location = {}
+                userModel.findOne({email: data.email}, {$set: {location}}).exec((err, docs) => {
                     if (err) {
                         callback(err)
                     }
@@ -482,9 +487,6 @@ router.post('/resetProfile', (req, res) => {
                 if (!data.hasOwnProperty('desc')) {
                     status = false
                 }
-                if (!data.hasOwnProperty('location')) {
-                    status = false
-                }
                 if (!data.hasOwnProperty('sex')) {
                     status = false
                 }
@@ -499,7 +501,6 @@ router.post('/resetProfile', (req, res) => {
                     $set: {
                         nickname: data.nickname,
                         desc: data.desc,
-                        location: data.location,
                         sex: data.sex
                     }
                 }).exec((err, doc) => {
