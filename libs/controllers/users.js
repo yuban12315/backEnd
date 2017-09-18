@@ -229,8 +229,7 @@ router.post('/login', (req, res) => {
             },
             //登录并修改地址
             (location, callback) => {
-                if (!location) location = {}
-                userModel.findOne({email: data.email}, {$set: {location}}).exec((err, docs) => {
+                userModel.findOne({email: data.email}, {$set: {l}}).exec((err, docs) => {
                     if (err) {
                         callback(err)
                     }
@@ -601,17 +600,17 @@ router.post('/resetAvatar', upload.single("avatar"), (req, res) => {
     }
 })
 
-//test
-router.post('/testFile', upload.single("avatar"), (req, res) => {
-    let data = req.body || {}
-    console.log(data || "data = null")
-    console.log(req.file || "file = null")
-    //let filename = req.file.filename
-
-    res.send({
-        file: req.file,
-        data: req.body
-    })
-})
+//test 文件测试路径
+// router.post('/testFile', upload.single("avatar"), (req, res) => {
+//     let data = req.body || {}
+//     console.log(data || "data = null")
+//     console.log(req.file || "file = null")
+//     //let filename = req.file.filename
+//
+//     res.send({
+//         file: req.file,
+//         data: req.body
+//     })
+// })
 
 module.exports = router

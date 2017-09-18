@@ -4,7 +4,9 @@
   "private": true,
   "scripts": {
     "start": "node ./bin/www",
-    "debug": "supervisor ./bin/www"
+    "debug": "supervisor ./bin/www",
+    "forever": "forever start ./bin/www",
+    "stop": "forever stop ./bin/www"
   },
   "dependencies": {
     "async": "^2.5.0",
@@ -14,6 +16,7 @@
     "debug": "~2.6.3",
     "express": "~4.15.2",
     "express-session": "^1.15.5",
+    "forever": "^0.15.3",
     "jade": "~1.11.0",
     "lodash": "^4.17.4",
     "mongoose": "^4.11.5",

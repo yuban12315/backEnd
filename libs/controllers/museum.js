@@ -15,6 +15,7 @@ router.get('/', function (req, res, next) {
 
 //获取附近的museum
 router.get('/nearBy', (req, res) => {
+    let data=[]
     async.waterfall([
         //地址信息
         (callback) => {
@@ -29,13 +30,21 @@ router.get('/nearBy', (req, res) => {
                 let ip
                 if (req.ip = '127.0.0.1') ip = '183.175.12.157'
                 else ip = req.ip
+                userService.getAddress(ip, (error,response)=>callback(error,response))
             }
         },
         //从数据库返回-city
         (location, callback) => {
             console.log(location)
-            museumModel.find()
-            callback(null)
+            museumModel.find({location:{city:location.city}}).exec((error,docs)=>{
+                if (error){
+                    callback(error)
+                }else {
+                    console.log(docs)
+                    data = docs
+                    callback(null)
+                }
+            })
         }
 
     ], (error, result) => {
