@@ -6,7 +6,8 @@ let memorySchema = mongoose.Schema({
         required: true
     },
     owner: {
-        type: ObjectId
+        type: mongoose.Schema.Types.ObjectId,
+        required:true
     },
     time: Date,
     photos: [{
@@ -15,6 +16,7 @@ let memorySchema = mongoose.Schema({
         index: String
     }],
     published:Boolean,
+    museumID:String,
     display:Number
 })
 

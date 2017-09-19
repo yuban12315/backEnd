@@ -43,7 +43,7 @@ app.all('*', function (req, res, next) {
 
 app.use('/', index);
 app.use('/users', users);
-//app.use('/memory',memory)
+app.use('/memory',memory)
 app.use('/museum',museum)
 
 // catch 404 and forward to error handler

@@ -36,29 +36,41 @@ router.get('/nearBy', (req, res) => {
         //从数据库返回-city
         (location, callback) => {
             //console.log(location)
-            museumModel.find({"location.city": location.city}).exec((error, docs) => {
+            museumModel.find({"location.city": location.city}, {
+                "name": 1,
+                "startTime": 1,
+                "admin": 1,
+                "image": 1,
+                "location": 1
+            }).exec((error, docs) => {
                 if (error) {
                     callback(error)
                 } else {
                     //console.log(docs)
                     data = docs
-                    callback(null,location)
+                    callback(null, location)
                 }
             })
         },
         //从数据库返回-province,
-        (location,callback)=>{
-        museumModel.find({"location.province":location.province,"location.city":{$ne:location.city}}).exec((error,docs)=>{
-            if (error) {
-                callback(error)
-            } else {
-                //console.log(docs)
-                for (let i in docs){
-                    data.push(docs[i])
+        (location, callback) => {
+            museumModel.find({"location.province": location.province, "location.city": {$ne: location.city}}, {
+                "name": 1,
+                "startTime": 1,
+                "admin": 1,
+                "image": 1,
+                "location": 1
+            }).exec((error, docs) => {
+                if (error) {
+                    callback(error)
+                } else {
+                    //console.log(docs)
+                    for (let i in docs) {
+                        data.push(docs[i])
+                    }
+                    callback(null, data)
                 }
-                callback(null,data)
-            }
-        })
+            })
         }
 
     ], (error, result) => {
@@ -76,9 +88,47 @@ router.get('/nearBy', (req, res) => {
             })
         }
     })
-
 })
 
+//museum detail
+router.get('/detail', (req, res) => {
+    let id = req.query.id
+    async.waterfall([
+            //获取museum信息
+            (callback) => {
+                museumModel.findOne({"_id": id}).exec((error, doc) => {
+                    if (error) {
+                        callback(error)
+                    } else {
+                        if (doc === null) {
+                            callback(new Error("无此博物馆"))
+                        } else {
+                            callback(null, doc)
+                        }
+                    }
+                })
+            },
+            //获取museum里面的memory
+            (callback) => {
+                callback(null)
+            }
+        ],
+        (error, result) => {
+            if (error) {
+                res.send({
+                    status: false,
+                    msg: error.message,
+                    data: null
+                })
+            } else {
+                res.send({
+                    status: true,
+                    msg: "返回museum的详细信息",
+                    data: result
+                })
+            }
+        })
+})
 
 //创建
 router.post('/create', upload.single("image"), (req, res) => {
@@ -131,6 +181,11 @@ router.post('/create', upload.single("image"), (req, res) => {
             })
         }
     })
+})
+
+//修改
+router.post('/update', upload.single("image"), (req, res) => {
+
 })
 
 module.exports = router;
