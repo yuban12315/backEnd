@@ -15,7 +15,7 @@ router.get('/', function (req, res, next) {
 
 //获取附近的museum
 router.get('/nearBy', (req, res) => {
-    let data=[]
+    let data = []
     async.waterfall([
         //地址信息
         (callback) => {
@@ -30,21 +30,35 @@ router.get('/nearBy', (req, res) => {
                 let ip
                 if (req.ip = '127.0.0.1') ip = '183.175.12.157'
                 else ip = req.ip
-                userService.getAddress(ip, (error,response)=>callback(error,response))
+                userService.getAddress(ip, (error, response) => callback(error, response))
             }
         },
         //从数据库返回-city
         (location, callback) => {
-            console.log(location)
-            museumModel.find({"location.city":location.city}).exec((error,docs)=>{
-                if (error){
+            //console.log(location)
+            museumModel.find({"location.city": location.city}).exec((error, docs) => {
+                if (error) {
                     callback(error)
-                }else {
-                    console.log(docs)
+                } else {
+                    //console.log(docs)
                     data = docs
-                    callback(null)
+                    callback(null,location)
                 }
             })
+        },
+        //从数据库返回-province,
+        (location,callback)=>{
+        museumModel.find({"location.province":location.province,"location.city":{$ne:location.city}}).exec((error,docs)=>{
+            if (error) {
+                callback(error)
+            } else {
+                //console.log(docs)
+                for (let i in docs){
+                    data.push(docs[i])
+                }
+                callback(null,data)
+            }
+        })
         }
 
     ], (error, result) => {
@@ -65,66 +79,58 @@ router.get('/nearBy', (req, res) => {
 
 })
 
-//暂时只能本机使用
+
 //创建
 router.post('/create', upload.single("image"), (req, res) => {
-    if (req.ip === "127.0.0.1") {
-        let data = req.body || {}
-        data = JSON.parse(data.info)
-        console.log(data)
-        async.waterfall([
-            //图片处理
-            (callback) => {
-                if (!req.file) {
-                    callback(new Error("未获取到文件"))
-                } else {
-                    let filename = req.file.filename
-                    fileService.upload(filename, (error, response) => {
-                        if (error) {
-                            callback(error)
-                        }
-                        else {
-                            //console.log(response)
-                            data.image = response.key
-                            callback(null)
-                        }
-                    })
-                }
-            },
-            //存数据库
-            (callback) => {
-                let museum = new museumModel(data)
-                museum.save((error, docs) => {
+
+    let data = req.body || {}
+    data = JSON.parse(data.info)
+    console.log(data)
+    async.waterfall([
+        //图片处理
+        (callback) => {
+            if (!req.file) {
+                callback(new Error("未获取到文件"))
+            } else {
+                let filename = req.file.filename
+                fileService.upload(filename, (error, response) => {
                     if (error) {
                         callback(error)
                     }
                     else {
+                        //console.log(response)
+                        data.image = response.key
                         callback(null)
                     }
                 })
             }
-        ], (err) => {
-            if (err) {
-                res.send({
-                    status: false,
-                    msg: err.message
-                })
-            }
-            else {
-                res.send({
-                    status: true,
-                    msg: "创建museum成功"
-                })
-            }
-        })
-    }
-    else {
-        res.status(403)
-        res.send({
-            status: false,
-            msg: '403 Forbidden'
-        })
-    }
+        },
+        //存数据库
+        (callback) => {
+            let museum = new museumModel(data)
+            museum.save((error, docs) => {
+                if (error) {
+                    callback(error)
+                }
+                else {
+                    callback(null)
+                }
+            })
+        }
+    ], (err) => {
+        if (err) {
+            res.send({
+                status: false,
+                msg: err.message
+            })
+        }
+        else {
+            res.send({
+                status: true,
+                msg: "创建museum成功"
+            })
+        }
+    })
 })
 
 module.exports = router;
