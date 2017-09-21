@@ -52,7 +52,7 @@ module.exports = {
         'generator-star-spacing': 0,                //generator 星星的位置
         'comma-style': [2, "last"],                 //逗号在每行末尾
         'comma-dangle': [2, "never"],               //在数组或对象的末尾不能加逗号
-        //'prefer-const': 2,                          //在能使用const时候使用const
+        'prefer-const': 2,                          //在能使用const时候使用const
         'object-shorthand': 1,                      //使用对象字面量速写语法
         'quote-props': ["error", "as-needed"],      //对象属性名称尽量不使用引号
         'array-callback-return': 2,                 //在数组方法的回调中强制执行return语句

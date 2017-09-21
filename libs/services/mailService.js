@@ -27,7 +27,7 @@ class mailService {
             //text: `<h1>[MemoryLibrary]</h1><br/><h2>验证码：<b>${data.vcode}</b></h2><br/>`
         }
 
-        if (data.type == 'register') {
+        if (data.type === 'register') {
             opt.subject='[MemoryLibrary]注册验证码'
             opt.html = `<h1>[MemoryLibrary]</h1><br/>
                               <p>尊敬的用户：<br/>
@@ -37,7 +37,7 @@ class mailService {
                               消息来自：MemoryLibrary安全中心
                               </p> `
         }
-        else if (data.type == 'resetPassword') {
+        else if (data.type === 'resetPassword') {
             opt.subject='[MemoryLibrary]重置密码'
             opt.html = `<h1>[MemoryLibrary]</h1><br/>
                               <p>尊敬的用户：<br/>
