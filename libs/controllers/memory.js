@@ -1,4 +1,4 @@
-let express = require('express'),
+const express = require('express'),
     async = require('async'),
     router = express.Router(),
     userModel = require('./../dbs/models/userModel'),

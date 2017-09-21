@@ -52,12 +52,12 @@ module.exports = {
         'generator-star-spacing': 0,                //generator 星星的位置
         'comma-style': [2, "last"],                 //逗号在每行末尾
         'comma-dangle': [2, "never"],               //在数组或对象的末尾不能加逗号
-        'prefer-const': 2,                          //在能使用const时候使用const
+        //'prefer-const': 2,                          //在能使用const时候使用const
         'object-shorthand': 1,                      //使用对象字面量速写语法
         'quote-props': ["error", "as-needed"],      //对象属性名称尽量不使用引号
         'array-callback-return': 2,                 //在数组方法的回调中强制执行return语句
         'prefer-rest-params': 2,                    //建议使用其余参数(...arg)而不是 arguments
-        'space-before-function-paren': [2, 'never'],//不允许函数前空格
+        //'space-before-function-paren': [2, 'never'],//不允许函数前空格
         'space-before-blocks': 2,                   //块前必须插入空格
         'no-param-reassign': 2,                     //禁止重新分配功能参数
         'prefer-spread': 2,                         //使用扩展运算符...来调用可变函数

@@ -3,14 +3,13 @@ const express = require('express'),
     userService = require('./../services/userService'),
     uuid = require('uuid/v1'),
     async = require('async'),
-    md5 = require('crypto').createHash('md5'),
     userModel = require('./../dbs/models/userModel'),
     router = express.Router(),
     console = require('tracer').console(),
     upload = require('./../utils/avatarUpload'),
     fileService = require('./../services/fileService')
 
-router.get('/', function(req, res, next) {
+router.get('/', function(req, res) {
     res.send(`respond with a resource:${req.ip}`)
 })
 
@@ -19,6 +18,7 @@ router.post('/getVcode', (req, res) => {
     const mailAdress = req.body.mailTo || null
     //console.log(req.body)
     if (mailAdress) {
+        //async 版
         async.waterfall([
             //检查邮箱是否已经被注册
             (callback) => {
@@ -68,6 +68,7 @@ router.post('/getVcode', (req, res) => {
                 })
             }
         })
+        //async await版
     }
     //未发送邮件
     else {
@@ -148,7 +149,7 @@ router.post('/register', (req, res) => {
         },
         //获取位置
         (callback) => {
-            userService.getAddress(req.ip, (err, loc) => {
+            userService.getAddress_old(req.ip, (err, loc) => {
                 if (err) {
                     callback(err)
                 }
@@ -225,7 +226,7 @@ router.post('/login', (req, res) => {
             },
             //获取地址
             (callback) => {
-                userService.getAddress(req.ip, (error, response) => callback(error, response))
+                userService.getAddress_old(req.ip, (error, response) => callback(error, response))
             },
             //登录
             (location, callback) => {
