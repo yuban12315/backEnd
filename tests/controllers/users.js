@@ -1,6 +1,6 @@
 let request = require('superagent')
 let async = require('async')
-let url = 'http://127.0.0.1:3000/users'
+let url = 'http://123.207.157.229:3000/users'
 
 /**
  * 注册新用户*/

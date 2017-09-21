@@ -227,12 +227,9 @@ router.post('/login', (req, res) => {
             (callback) => {
                 userService.getAddress(req.ip, (error, response) => callback(error, response))
             },
-            //登录并修改地址
+            //登录
             (location, callback) => {
-                userModel.findOne({email: data.email}, {$set: {location:{
-                    city:location.city,
-                    province:location.province
-                }}}).exec((err, docs) => {
+                userModel.findOne({email: data.email}).exec((err, docs) => {
                     if (err) {
                         callback(err)
                     }
@@ -245,12 +242,23 @@ router.post('/login', (req, res) => {
                                 callback(new Error("密码错误"))
                             }
                             else {
-                                callback(null)
+                                callback(null, location)
                             }
                             //data.password = md5.update(data.password).digest('hex');
                         }
                     }
                 })
+            },
+            //修改地址
+            (location, callback) => {
+                userModel.update({email: data.email}, {
+                    $set: {
+                        location: {
+                            city: location.city,
+                            province: location.province
+                        }
+                    }
+                }).exec((error) =>callback(error))
             }
         ], (err) => {
             if (err) {

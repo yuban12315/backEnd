@@ -149,7 +149,7 @@ router.post('/create', upload.single("image"), (req, res) => {
                     }
                     else {
                         //console.log(response)
-                        data.image = response.key
+                        data.image = "http://ocxi5zst0.bkt.clouddn.com/"+response.key
                         callback(null)
                     }
                 })

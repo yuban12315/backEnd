@@ -25,24 +25,13 @@ router.post("/testFile",upload.array("image"),(req, res)=>{
     console.log(data || "data = null")
     console.log(req.file || "file = null")
     //let filename = req.file.filename
+    console.log(req.files)
 
     res.send({
         file: req.file,
         data: req.body
     })
 })
-
-// router.post('/testFile', upload.single("avatar"), (req, res) => {
-//     let data = req.body || {}
-//     console.log(data || "data = null")
-//     console.log(req.file || "file = null")
-//     //let filename = req.file.filename
-//
-//     res.send({
-//         file: req.file,
-//         data: req.body
-//     })
-// })
 
 
 
