@@ -6,7 +6,8 @@ let express = require('express'),
     upload = require('./../utils/museumImage'),
     console = require('tracer').console(),
     fileService = require('./../services/fileService'),
-    museumModel = require('./../dbs/models/museumModel')
+    museumModel = require('./../dbs/models/museumModel'),
+    mongoose = require('mongoose')
 
 
 router.get('/', function (req, res, next) {
@@ -92,25 +93,36 @@ router.get('/nearBy', (req, res) => {
 
 //museum detail
 router.get('/detail', (req, res) => {
-    let id = req.query.id
+    let id = req.query.id||''
+    //console.log(id)
     async.waterfall([
-            //获取museum信息
+            //string to objectID
             (callback) => {
-                museumModel.findOne({"_id": id}).exec((error, doc) => {
+                if (id.length !== 24) {
+                    callback(new Error('id长度应该为24，当前长度：' + id.length))
+                } else {
+                    id = mongoose.Types.ObjectId(id)
+                    callback(null,id)
+                }
+            },
+            //获取museum信息
+            (objectId,callback) => {
+        console.log(objectId)
+                museumModel.findOne({"_id": objectId}).exec((error, doc) => {
                     if (error) {
                         callback(error)
                     } else {
                         if (doc === null) {
                             callback(new Error("无此博物馆"))
                         } else {
-                            callback(null, doc)
+                            callback(null,doc)
                         }
                     }
                 })
             },
             //获取museum里面的memory
-            (callback) => {
-                callback(null)
+            (document, callback) => {
+                callback(null,document)
             }
         ],
         (error, result) => {
@@ -149,7 +161,7 @@ router.post('/create', upload.single("image"), (req, res) => {
                     }
                     else {
                         //console.log(response)
-                        data.image = "http://ocxi5zst0.bkt.clouddn.com/"+response.key
+                        data.image = "http://ocxi5zst0.bkt.clouddn.com/" + response.key
                         callback(null)
                     }
                 })

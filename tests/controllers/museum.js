@@ -1,6 +1,8 @@
-let request=require("superagent")
+let request = require("superagent")
 
-let url = 'http://127.0.0.1:3000/museum'
+let url = 'http://127.0.0.1:3000/museum',
+    async = require('async'),
+    console = require('tracer').console()
 
 // 创建museum (√)
 // let data={
@@ -27,7 +29,30 @@ let url = 'http://127.0.0.1:3000/museum'
 // })
 
 //返回附近museum
-request.get(url+'/nearBy').end((error,res)=>{
-    console.log(res.text)
-})
+// request.get(url + '/nearBy').end((error, res) => {
+//     if (error) console.log(error)
+//     if (res) {
+//         let data = JSON.parse(res.text)
+//         async.map(data.data,(i,callback)=>{
+//             console.log(i)
+//             request.get(url+'/detail?id='+i._id).end((error,res)=>{
+//                 if (error)callback(error)
+//                 else {
+//                     callback(null,res)
+//                 }
+//             })
+//         }, (error, docs) => {
+//             if (error) console.log(error)
+//             if (docs) console.log(docs)
+//         })
+//     }
+// })
+//
 
+//detail test
+request.get(url + '/detail?id=59bf879bdf0fd03ce8414f59').end((error, res) => {
+    if (error) console.log(error)
+    else {
+        console.log(res.text)
+    }
+})
