@@ -1,7 +1,0 @@
-{
-  "uid":"app",
-  "append":"true",
-  "watch":"true",
-  "script":"www",
-  "sourceDir":"/bin"
-}

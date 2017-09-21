@@ -1,6 +1,6 @@
 const mongoose = require('./../mongoose')
 
-let memorySchema = mongoose.Schema({
+const memorySchema = mongoose.Schema({
     desc: {
         type: String,
         required: true
@@ -20,6 +20,6 @@ let memorySchema = mongoose.Schema({
     display:Number
 })
 
-let memoryModel = mongoose.model('memory', memorySchema)
+const memoryModel = mongoose.model('memory', memorySchema)
 
 module.exports = memoryModel

@@ -1,4 +1,4 @@
-let config = require('./../config'),
+const config = require('./../config'),
     storage = require('qiniu'),
     fs=require('fs')
 
@@ -12,16 +12,16 @@ class fileService {
     }
 
     upload(filename, callback) {
-        this.uploadFile(filename, './uploads/' + filename, callback)
+        this.uploadFile(filename, `./uploads/${filename}`, callback)
     }
 
     //内部方法
     uploadFile(key, file_path, callback) {
         this.key = key
         this.file_path = file_path
-        let token = this.uptoken()
+        const token = this.uptoken()
         //console.log(token)
-        let extra = new storage.io.PutExtra()
+        const extra = new storage.io.PutExtra()
         storage.io.putFile(token, this.key, this.file_path, extra, (err, res) => {
             if (err) {
                 callback(err)
@@ -35,19 +35,18 @@ class fileService {
         })
     }
 
-    deleteFile(file_path){
+    deleteFile(file_path) {
         fs.unlink(file_path,(err)=>{
             if (err) throw err
         })
     }
 
     uptoken() {
-        let put_policy = new storage.rs.PutPolicy(this.bucket + ":" + this.key)
+        const put_policy = new storage.rs.PutPolicy(`${this.bucket}:${this.key}`)
         //put_policy.callbackUrl = 'http://ocxi5zst0.bkt.clouddn.com/callback.php'
         //put_policy.callbackBody = 'filename=$(fname)&filesize=$(fsize)'
         return put_policy.token()
     }
-
 
 }
 

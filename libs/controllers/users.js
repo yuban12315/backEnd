@@ -1,4 +1,4 @@
-let express = require('express'),
+const express = require('express'),
     mailer = require('./../services/mailService'),
     userService = require('./../services/userService'),
     uuid = require('uuid/v1'),
@@ -10,13 +10,13 @@ let express = require('express'),
     upload = require('./../utils/avatarUpload'),
     fileService = require('./../services/fileService')
 
-router.get('/', function (req, res, next) {
-    res.send('respond with a resource:' + req.ip)
+router.get('/', function(req, res, next) {
+    res.send(`respond with a resource:${req.ip}`)
 })
 
 //获取注册时验证码
 router.post('/getVcode', (req, res) => {
-    let mailAdress = req.body.mailTo || null
+    const mailAdress = req.body.mailTo || null
     //console.log(req.body)
     if (mailAdress) {
         async.waterfall([
@@ -36,12 +36,12 @@ router.post('/getVcode', (req, res) => {
             //发送邮件
             (callback) => {
                 //生成验证码
-                let vcode = uuid().toString().substring(0, 6)
+                const vcode = uuid().toString().substring(0, 6)
                 //验证码存入session
                 req.session.vcode = vcode
                 mailer.sendMail({
                     mailTo: mailAdress,
-                    vcode: vcode,
+                    vcode,
                     type: 'register'
                 }, (err) => {
                     //出现错误
@@ -64,7 +64,7 @@ router.post('/getVcode', (req, res) => {
             else {
                 res.send({
                     status: true,
-                    msg: "发送邮件成功"
+                    msg: '发送邮件成功'
                 })
             }
         })
@@ -80,7 +80,7 @@ router.post('/getVcode', (req, res) => {
 
 //注册
 router.post('/register', (req, res) => {
-    let data = req.body || {}
+    const data = req.body || {}
     async.waterfall([
         //检查data结构
         (callback) => {
@@ -117,16 +117,16 @@ router.post('/register', (req, res) => {
             if (status) {
                 callback(null)
             } else {
-                callback(new Error("未通过结构验证"))
+                callback(new Error('未通过结构验证'))
             }
         },
         //检查验证码是否正确
         (callback) => {
             if (!req.session.vcode) {
-                callback(new Error("请先获取验证码"))
+                callback(new Error('请先获取验证码'))
             }
             else if (data.vcode != req.session.vcode) {
-                callback(new Error("验证码错误"))
+                callback(new Error('验证码错误'))
             }
             else {
                 callback(null)
@@ -138,7 +138,7 @@ router.post('/register', (req, res) => {
                 if (err) {
                     callback(err)
                 } else if (docs != null) {
-                    callback(new Error("邮箱已被占用"))
+                    callback(new Error('邮箱已被占用'))
                 }
                 //未被占用
                 else {
@@ -162,7 +162,7 @@ router.post('/register', (req, res) => {
             data._salt = uuid().toString().substring(0, 8)
             data.location = location
             data.password = userService.secret(data.password, data._salt)
-            let user = new userModel(data)
+            const user = new userModel(data)
             user.save((err, docs) => {
                 if (err) {
                     callback(err)
@@ -182,7 +182,7 @@ router.post('/register', (req, res) => {
         else {
             res.send({
                 status: true,
-                msg: "注册成功"
+                msg: '注册成功'
             })
         }
     })
@@ -194,10 +194,10 @@ router.post('/login', (req, res) => {
     if (req.session.logged == true) {
         res.send({
             status: true,
-            msg: "已经登录过"
+            msg: '已经登录过'
         })
     } else {
-        let data = req.body || {}
+        const data = req.body || {}
         //console.log(data)
         async.waterfall([
             //检查data结构
@@ -220,7 +220,7 @@ router.post('/login', (req, res) => {
                 if (status) {
                     callback(null)
                 } else {
-                    callback(new Error("未通过结构验证"))
+                    callback(new Error('未通过结构验证'))
                 }
             },
             //获取地址
@@ -235,11 +235,11 @@ router.post('/login', (req, res) => {
                     }
                     else {
                         if (docs === null) {
-                            callback(new Error("用户不存在"))
+                            callback(new Error('用户不存在'))
                         } else {
-                            let password = userService.secret(data.password, docs._salt)
+                            const password = userService.secret(data.password, docs._salt)
                             if (password !== docs.password) {
-                                callback(new Error("密码错误"))
+                                callback(new Error('密码错误'))
                             }
                             else {
                                 callback(null, location)
@@ -272,7 +272,7 @@ router.post('/login', (req, res) => {
                 //console.log(req.session.email + ' ' + req.session.logged)
                 res.send({
                     status: true,
-                    msg: "登录成功"
+                    msg: '登录成功'
                 })
             }
         })
@@ -293,13 +293,13 @@ router.get('/logout', (req, res) => {
     }
     res.send({
         status: true,
-        msg: "退出登录成功"
+        msg: '退出登录成功'
     })
 })
 
 //获取重置密码时验证码
 router.post('/getVcode2', (req, res) => {
-    let mailAdress = req.body.mailTo || null
+    const mailAdress = req.body.mailTo || null
     if (mailAdress) {
         async.waterfall([
             //检查邮箱是否是注册邮箱
@@ -318,12 +318,12 @@ router.post('/getVcode2', (req, res) => {
             //发送邮件
             (callback) => {
                 //生成验证码
-                let vcode = uuid().toString().substring(0, 6)
+                const vcode = uuid().toString().substring(0, 6)
                 //验证码存入session
                 req.session.vcode2 = vcode
                 mailer.sendMail({
                     mailTo: mailAdress,
-                    vcode: vcode,
+                    vcode,
                     type: 'resetPassword'
                 }, (err) => {
                     //出现错误
@@ -346,7 +346,7 @@ router.post('/getVcode2', (req, res) => {
             else {
                 res.send({
                     status: true,
-                    msg: "发送邮件成功"
+                    msg: '发送邮件成功'
                 })
             }
         })
@@ -362,7 +362,7 @@ router.post('/getVcode2', (req, res) => {
 
 //重置密码
 router.post('/resetPassword', (req, res) => {
-    let data = req.body || {}
+    const data = req.body || {}
     async.waterfall([
         //检查data结构
         (callback) => {
@@ -391,19 +391,19 @@ router.post('/resetPassword', (req, res) => {
             if (status) {
                 callback(null)
             } else {
-                callback(new Error("未通过结构验证"))
+                callback(new Error('未通过结构验证'))
             }
         },
         //检查验证码
         (callback) => {
             if (!req.session.vcode2) {
-                callback(new Error("请先获取验证码"))
+                callback(new Error('请先获取验证码'))
             }
             else if (data.vcode2 != req.session.vcode2) {
-                callback(new Error("验证码错误"))
+                callback(new Error('验证码错误'))
             }
             else {
-                userModel.findOne({email: data.email}, {"_salt": "1"}).exec((err, docs) => {
+                userModel.findOne({email: data.email}, {_salt: '1'}).exec((err, docs) => {
                     if (err) {
                         callback(err)
                     }
@@ -415,13 +415,13 @@ router.post('/resetPassword', (req, res) => {
         },
         //修改数据库内密码
         (_salt, callback) => {
-            let password = userService.secret(data.password, _salt)
-            userModel.update({email: data.email}, {$set: {password: password}}).exec((err, doc) => {
+            const password = userService.secret(data.password, _salt)
+            userModel.update({email: data.email}, {$set: {password}}).exec((err, doc) => {
                 if (err) {
                     callback(err)
                 }
                 else if (doc.nModified != 1) {
-                    callback(new Error("修改密码失败"))
+                    callback(new Error('修改密码失败'))
                 }
                 else {
                     callback(null)
@@ -438,7 +438,7 @@ router.post('/resetPassword', (req, res) => {
         else {
             res.send({
                 status: true,
-                msg: "修改密码成功"
+                msg: '修改密码成功'
             })
         }
     })
@@ -448,20 +448,20 @@ router.post('/resetPassword', (req, res) => {
 router.get('/getProfile', (req, res) => {
     async.waterfall([
         (callback) => {
-            let email = req.query.email || req.session.email
+            const email = req.query.email || req.session.email
             userModel.findOne({email}, {
-                "email": 1,
-                "nickname": 1,
-                "sex": 1,
-                "desc": 1,
-                "location": 1,
-                "avatar": 1
+                email: 1,
+                nickname: 1,
+                sex: 1,
+                desc: 1,
+                location: 1,
+                avatar: 1
             }).exec((error, doc) => {
                 if (error) {
                     callback(error)
                 }
                 else if (doc === null) {
-                    callback(new Error("无此用户"))
+                    callback(new Error('无此用户'))
                 }
                 else callback(null, doc)
             })
@@ -476,7 +476,7 @@ router.get('/getProfile', (req, res) => {
         else {
             res.send({
                 status: true,
-                msg: "返回个人资料",
+                msg: '返回个人资料',
                 data: result
             })
         }
@@ -485,7 +485,7 @@ router.get('/getProfile', (req, res) => {
 
 //重置个人资料
 router.post('/resetProfile', (req, res) => {
-    let data = req.body || {}
+    const data = req.body || {}
     //console.log(data)
     if (req.session.logged === true) {
         async.waterfall([
@@ -503,7 +503,7 @@ router.post('/resetProfile', (req, res) => {
                 if (status) {
                     callback(null)
                 } else {
-                    callback(new Error("未通过结构验证"))
+                    callback(new Error('未通过结构验证'))
                 }
             },
             (callback) => {
@@ -518,7 +518,7 @@ router.post('/resetProfile', (req, res) => {
                         callback(err)
                     }
                     else if (doc.nModified != 1) {
-                        callback(new Error("修改昵称失败"))
+                        callback(new Error('修改昵称失败'))
                     }
                     else {
                         callback(null)
@@ -535,31 +535,31 @@ router.post('/resetProfile', (req, res) => {
             else {
                 res.send({
                     status: true,
-                    msg: "修改资料成功"
+                    msg: '修改资料成功'
                 })
             }
         })
     } else {
         res.send({
             status: false,
-            msg: "请先登录"
+            msg: '请先登录'
         })
     }
 })
 
 //修改头像
-router.post('/resetAvatar', upload.single("avatar"), (req, res) => {
-    let data = req.body || {}
+router.post('/resetAvatar', upload.single('avatar'), (req, res) => {
+    const data = req.body || {}
     //console.log(data)
     if (req.session.logged === true) {
         //console.log(req.file.buffer)
         async.waterfall([
             //头像文件上传七牛云
             (callback) => {
-                let filename = req.file.filename
+                const filename = req.file.filename
                 //console.log(filename)
                 if (!filename) {
-                    callback(new Error("未获取到文件"))
+                    callback(new Error('未获取到文件'))
                 } else {
                     fileService.upload(filename, (error, response) => {
                         if (error) {
@@ -575,13 +575,13 @@ router.post('/resetAvatar', upload.single("avatar"), (req, res) => {
             //修改的头像存数据库
             (avatar, callback) => {
                 userModel.update({email: req.session.email}, {
-                    $set: {avatar: "http://ocxi5zst0.bkt.clouddn.com/" + avatar}
+                    $set: {avatar: `http://ocxi5zst0.bkt.clouddn.com/${avatar}`}
                 }).exec((err, doc) => {
                     if (err) {
                         callback(err)
                     }
                     else if (doc.nModified != 1) {
-                        callback(new Error("修改头像失败"))
+                        callback(new Error('修改头像失败'))
                     }
                     else {
                         callback(null, avatar)
@@ -598,7 +598,7 @@ router.post('/resetAvatar', upload.single("avatar"), (req, res) => {
             else {
                 res.send({
                     status: true,
-                    msg: "修改头像成功",
+                    msg: '修改头像成功',
                     avatar
                 })
             }
@@ -606,7 +606,7 @@ router.post('/resetAvatar', upload.single("avatar"), (req, res) => {
     } else {
         res.send({
             status: false,
-            msg: "请先登录"
+            msg: '请先登录'
         })
     }
 })

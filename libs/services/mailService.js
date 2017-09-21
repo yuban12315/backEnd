@@ -1,11 +1,11 @@
-let config = require('./../config')
-let mailer = require('nodemailer')
+const config = require('./../config')
+const mailer = require('nodemailer')
 
 class mailService {
 
     constructor() {
         this._transporter = mailer.createTransport({
-            host: "smtp.qq.com",
+            host: 'smtp.qq.com',
             secureConnection: true,
             port: 465,
             auth: config.mail
@@ -20,9 +20,9 @@ class mailService {
             }
         }
 
-        let opt = {
+        const opt = {
             from: config.mail.user,
-            to: data.mailTo,
+            to: data.mailTo
             //subject: `[MemoryLibrary]${data.type}`,
             //text: `<h1>[MemoryLibrary]</h1><br/><h2>验证码：<b>${data.vcode}</b></h2><br/>`
         }
@@ -59,11 +59,10 @@ class mailService {
         })
     }
 
-    checkMail(mail){
-        let t=mail||''
+    checkMail(mail) {
+        const t=mail||''
         return /^([a-zA-Z0-9]+[_|\_|\.]?)*[a-zA-Z0-9]+@([a-zA-Z0-9]+[_|\_|\.]?)*[a-zA-Z0-9]+\.[a-zA-Z]{2,3}$/.test(t)
     }
-
 
 }
 

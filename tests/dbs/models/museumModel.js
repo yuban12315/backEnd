@@ -1,6 +1,6 @@
-let museumModel = require('./../../../libs/dbs/models/museumModel')
-let async = require('async')
-let mongoose=require('mongoose')
+const museumModel = require('./../../../libs/dbs/models/museumModel')
+const async = require('async')
+const mongoose=require('mongoose')
 
 // museumModel.find().exec((error, docs) => {
 //     console.log(docs)
@@ -18,7 +18,7 @@ let mongoose=require('mongoose')
 //     })
 // })
 
-let _id="59bf879bdf0fd03ce8414f59"
+const _id='59bf879bdf0fd03ce8414f59'
 console.log(_id.length)
-let id=mongoose.Types.ObjectId(_id)
+const id=mongoose.Types.ObjectId(_id)
 console.log(typeof (id))

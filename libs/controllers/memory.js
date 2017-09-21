@@ -8,22 +8,21 @@ let express = require('express'),
     fileService = require('./../services/fileService'),
     memoryModel=require('./../dbs/models/memoryModel')
 
-
-router.get('/', function (req, res, next) {
-    res.send("router about memories" + req.ip)
+router.get('/', function(req, res, next) {
+    res.send(`router about memories${req.ip}`)
 })
 
 router.post('/create',(req, res)=>{
-    let data=req.body||{}
+    const data=req.body||{}
     // async.waterfall([
     //
     // ])
 })
 
-router.post("/testFile",upload.array("image"),(req, res)=>{
-    let data = req.body || {}
-    console.log(data || "data = null")
-    console.log(req.file || "file = null")
+router.post('/testFile',upload.array('image'),(req, res)=>{
+    const data = req.body || {}
+    console.log(data || 'data = null')
+    console.log(req.file || 'file = null')
     //let filename = req.file.filename
     console.log(req.files)
 
@@ -33,7 +32,4 @@ router.post("/testFile",upload.array("image"),(req, res)=>{
     })
 })
 
-
-
-
-module.exports = router;
+module.exports = router

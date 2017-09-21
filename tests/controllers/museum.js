@@ -1,4 +1,4 @@
-let request = require("superagent")
+const request = require('superagent')
 
 let url = 'http://127.0.0.1:3000/museum',
     async = require('async'),
@@ -50,7 +50,7 @@ let url = 'http://127.0.0.1:3000/museum',
 //
 
 //detail test
-request.get(url + '/detail?id=59bf879bdf0fd03ce8414f59').end((error, res) => {
+request.get(`${url}/detail?id=59bf879bdf0fd03ce8414f59`).end((error, res) => {
     if (error) console.log(error)
     else {
         console.log(res.text)

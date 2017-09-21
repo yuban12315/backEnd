@@ -1,8 +1,7 @@
-let mongoose=require('mongoose')
-let config=require('./../config')
+const mongoose=require('mongoose')
+const config=require('./../config')
 
-
-let opt={
+const opt={
     user: config.user,
     pass: config.pass,
     auth: {

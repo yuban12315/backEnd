@@ -1,6 +1,6 @@
-let request = require('superagent')
-let async = require('async')
-let url = 'http://123.207.157.229:3000/users'
+const request = require('superagent')
+const async = require('async')
+const url = 'http://123.207.157.229:3000/users'
 
 /**
  * 注册新用户*/
@@ -63,21 +63,21 @@ let cookie
 async.waterfall([
     //登录
     (callback) => {
-        request.post(url + '/login', {
-            email: "455678228@qq.com",
-            password: "123456"
+        request.post(`${url}/login`, {
+            email: '455678228@qq.com',
+            password: '123456'
         }).end((err, res) => {
             if (err) {
                 callback(err)
             }
             else {
-                cookie = res.header["set-cookie"]
+                cookie = res.header['set-cookie']
                 //console.log(cookie)
                 console.log(res.text)
                 callback(null)
             }
         })
-    },
+    }
 
     //获取资料
     // (callback) => {
@@ -114,7 +114,6 @@ async.waterfall([
     //         }
     //     })
     // }
-
 
 ], (err, res) => {
     if (err) console.log(err.message)

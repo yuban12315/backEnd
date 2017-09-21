@@ -1,5 +1,5 @@
 const mongoose = require('./../mongoose')
-let museumSchema = mongoose.Schema({
+const museumSchema = mongoose.Schema({
     name: {
         type: String,
         required: true
@@ -28,11 +28,11 @@ let museumSchema = mongoose.Schema({
     admin:{
         email:{
             type:String,
-            default:"455678228@qq.com"
+            default:'455678228@qq.com'
         }
     }
 })
 
-let museumModel=mongoose.model('museum',museumSchema)
+const museumModel=mongoose.model('museum',museumSchema)
 
 module.exports=museumModel

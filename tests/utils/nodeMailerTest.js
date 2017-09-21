@@ -1,29 +1,29 @@
-let mailer=require('nodemailer')
-let config=require('./../../libs/config')
+const mailer=require('nodemailer')
+const config=require('./../../libs/config')
 
-let transporter=mailer.createTransport({
-    host:"smtp.qq.com",
+const transporter=mailer.createTransport({
+    host:'smtp.qq.com',
     secureConnection:true,
     port:465,
     auth:config.mail
 })
 
-let sendMail=(html)=>{
-    let option={
+const sendMail=(html)=>{
+    const option={
         from:config.mail.user,
-        to:"17678031600@163.com",
+        to:'17678031600@163.com',
 
-        subject:"hello",
-        html:html,
+        subject:'hello',
+        html,
         text:html
     }
     transporter.sendMail(option,(error, response)=>{
-        if(error){
-            console.log("fail: " + error);
+        if(error) {
+            console.log(`fail: ${error}`)
         }else{
-            console.log("success: " + response.message);
+            console.log(`success: ${response.message}`)
         }})
 }
 
-sendMail("happy birthday")
+sendMail('happy birthday')
 

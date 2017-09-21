@@ -1,6 +1,6 @@
-let mailService = require('./../../libs/services/mailService')
+const mailService = require('./../../libs/services/mailService')
 
-let data = {
+const data = {
     mailTo: 'misaka12315@gmail.com',
     vcode:'123456',
     type:'register'

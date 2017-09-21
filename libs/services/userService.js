@@ -1,7 +1,7 @@
-let async = require('async')
-let request = require('superagent-charset')(require('superagent'))
-let crypto=require('crypto')
-let console=require("tracer").console()
+const async = require('async')
+const request = require('superagent-charset')(require('superagent'))
+const crypto=require('crypto')
+const console=require('tracer').console()
 
 class userService {
     constructor() {
@@ -11,13 +11,13 @@ class userService {
     //获取地址
     getAddress(ip, callback) {
         /*默认返回服务器地址*/
-        request.get("http://int.dpool.sina.com.cn/iplookup/iplookup.php?format=js&ip=" + ip).charset('utf-8').end((err, res) => {
+        request.get(`http://int.dpool.sina.com.cn/iplookup/iplookup.php?format=js&ip=${ip}`).charset('utf-8').end((err, res) => {
             if (err || !res.hasOwnProperty('text')) {
                 callback(err)
             } else {
-                let text=res.text.substring(res.text.indexOf('{'),res.text.indexOf(';'))
+                const text=res.text.substring(res.text.indexOf('{'),res.text.indexOf(';'))
                 //console.log(text)
-                if (text.includes("{")){
+                if (text.includes('{')) {
                     let data=JSON.parse(text)
                     data={
                         province:data.province,
@@ -26,7 +26,7 @@ class userService {
                     callback(null,data)
                 }
                 else {
-                    callback(new Error("获取地址失败"))
+                    callback(new Error('获取地址失败'))
                 }
             }
         })
@@ -37,10 +37,10 @@ class userService {
     }
 
     //加密
-    secret(password,salt){
+    secret(password,salt) {
         //docs.password != md5.update(data.password + docs._salt).digest('hex')
-        let md5 = crypto.createHash('md5')
-        let t=md5.update(password+salt)
+        const md5 = crypto.createHash('md5')
+        const t=md5.update(password+salt)
         return md5.digest('hex')
     }
 }
