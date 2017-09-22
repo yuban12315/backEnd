@@ -5,7 +5,7 @@ const express = require('express'),
     userService = require('./../services/userService'),
     upload = require('./../utils/museumImage'),
     console = require('tracer').console(),
-    fileService = require('./../services/fileService'),
+    fileService = require('../services/fileService_old'),
     museumModel = require('./../dbs/models/museumModel'),
     mongoose = require('mongoose')
 
@@ -14,7 +14,7 @@ router.get('/', (req, res) => {
 })
 
 //获取附近的museum
-router.get('/nearBy', async (req, res) => {
+router.get('/nearBy', async (req, res, next) => {
     try {
         let location
         //登录用户从数据库获取地址信息
@@ -63,16 +63,12 @@ router.get('/nearBy', async (req, res) => {
             data
         })
     } catch (error) {
-        res.send({
-            status: false,
-            msg: `${error.name} : ${error.message}`,
-            data: null
-        })
+        next(error)
     }
 })
 
 //museum detail
-router.get('/detail', async (req, res) => {
+router.get('/detail', async (req, res, next) => {
     const id = req.query.id || ''
     try {
         if (id.length !== 24) {
@@ -87,65 +83,78 @@ router.get('/detail', async (req, res) => {
             data: doc
         })
     } catch (error) {
+        next(error)
+    }
+})
+
+//创建
+router.post('/create', upload.single('image'), async (req, res, next) => {
+
+    try {
+        let data = req.body || {}
+        data = JSON.parse(data.info)
+        if (!req.file) {
+            throw new Error('未获取到文件')
+        }
+        const filename=req.file.filename
+        await fileService.upload(filename)
+        res.send({
+            status:true,
+            msg:'创建museum成功'
+        })
+    } catch (error) {
         res.send({
             status: false,
             msg: `${error.name} : ${error.message}`,
             data: null
         })
     }
-})
 
-//创建
-router.post('/create', upload.single('image'), async (req, res) => {
-
-    let data = req.body || {}
-    data = JSON.parse(data.info)
-    console.log(data)
-    async.waterfall([
-        //图片处理
-        (callback) => {
-            if (!req.file) {
-                callback(new Error('未获取到文件'))
-            } else {
-                const filename = req.file.filename
-                fileService.upload(filename, (error, response) => {
-                    if (error) {
-                        callback(error)
-                    }
-                    else {
-                        //console.log(response)
-                        data.image = `http://ocxi5zst0.bkt.clouddn.com/${response.key}`
-                        callback(null)
-                    }
-                })
-            }
-        },
-        //存数据库
-        (callback) => {
-            const museum = new museumModel(data)
-            museum.save((error, docs) => {
-                if (error) {
-                    callback(error)
-                }
-                else {
-                    callback(null)
-                }
-            })
-        }
-    ], (err) => {
-        if (err) {
-            res.send({
-                status: false,
-                msg: err.message
-            })
-        }
-        else {
-            res.send({
-                status: true,
-                msg: '创建museum成功'
-            })
-        }
-    })
+    // async.waterfall([
+    //     //图片处理
+    //     (callback) => {
+    //         if (!req.file) {
+    //             callback(new Error('未获取到文件'))
+    //         } else {
+    //             const filename = req.file.filename
+    //             fileService.upload(filename, (error, response) => {
+    //                 if (error) {
+    //                     callback(error)
+    //                 }
+    //                 else {
+    //                     //console.log(response)
+    //                     data.image = `http://ocxi5zst0.bkt.clouddn.com/${response.key}`
+    //                     callback(null)
+    //                 }
+    //             })
+    //         }
+    //     },
+    //     //存数据库
+    //     (callback) => {
+    //         const museum = new museumModel(data)
+    //         museum.save((error, docs) => {
+    //             if (error) {
+    //                 callback(error)
+    //             }
+    //             else {
+    //                 callback(null)
+    //             }
+    //         })
+    //     }
+    // ], (err) => {
+    //     if (err) {
+    //         res.send({
+    //             status: false,
+    //             msg: err.message
+    //         })
+    //     }
+    //     else {
+    //         res.send({
+    //             status: true,
+    //             msg: '创建museum成功'
+    //         })
+    //     }
+    // })
 })
 
 //修改

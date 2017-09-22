@@ -7,7 +7,7 @@ const express = require('express'),
     router = express.Router(),
     console = require('tracer').console(),
     upload = require('./../utils/avatarUpload'),
-    fileService = require('./../services/fileService')
+    fileService = require('../services/fileService_old')
 
 router.get('/', function(req, res) {
     res.send(`respond with a resource:${req.ip}`)

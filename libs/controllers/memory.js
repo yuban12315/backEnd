@@ -5,7 +5,7 @@ const express = require('express'),
     userService = require('./../services/userService'),
     upload = require('./../utils/memoryImage'),
     console = require('tracer').console(),
-    fileService = require('./../services/fileService'),
+    fileService = require('../services/fileService_old'),
     memoryModel=require('./../dbs/models/memoryModel')
 
 router.get('/', function(req, res, next) {

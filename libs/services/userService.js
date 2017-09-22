@@ -38,15 +38,14 @@ class userService {
 
     //获取地址(es6版)
     static async getAdress(ip) {
-        if (ip ==='127.0.0.1')ip = '183.175.12.157'
-        const res = await request.get(`http://int.dpool.sina.com.cn/iplookup/iplookup.php?format=js&ip=${ip}`).charset('utf-8')
+        let remoteIP
+        if (ip === '127.0.0.1') remoteIP = '183.175.12.157'
+        else remoteIP=ip
+        const res = await request.get(`http://int.dpool.sina.com.cn/iplookup/iplookup.php?format=js&ip=${remoteIP}`).charset('utf-8')
         //console.log(res)
-        if (!res.text) {
-            throw new Error('连接新浪地址服务器失败')
-        }
         const text = res.text.substring(res.text.indexOf('{'), res.text.indexOf(';'))
         if (!text.includes('{')) {
-            throw new Error(`获取地址信息失败，失败ip：${ip}`)
+            throw new Error(`获取地址信息失败，失败ip：${remoteIP}`)
         }
         let data = JSON.parse(text)
         data = {
