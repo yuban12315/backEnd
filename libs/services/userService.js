@@ -38,6 +38,7 @@ class userService {
 
     //获取地址(es6版)
     static async getAdress(ip) {
+        if (ip ==='127.0.0.1')ip = '183.175.12.157'
         const res = await request.get(`http://int.dpool.sina.com.cn/iplookup/iplookup.php?format=js&ip=${ip}`).charset('utf-8')
         //console.log(res)
         if (!res.text) {
@@ -45,7 +46,7 @@ class userService {
         }
         const text = res.text.substring(res.text.indexOf('{'), res.text.indexOf(';'))
         if (!text.includes('{')) {
-            return new Error(`获取地址信息失败，失败ip${ip}`)
+            throw new Error(`获取地址信息失败，失败ip：${ip}`)
         }
         let data = JSON.parse(text)
         data = {

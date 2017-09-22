@@ -1,9 +1,12 @@
 const express = require('express')
 const router = express.Router()
+const userSerive=require('./../services/userService')
 
 /* GET home page. */
-router.get('/', function(req, res, next) {
+
+router.get('/',  async function (req, res) {
     res.send('index')
 })
+
 
 module.exports = router

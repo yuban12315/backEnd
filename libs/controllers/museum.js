@@ -14,133 +14,89 @@ router.get('/', (req, res) => {
 })
 
 //获取附近的museum
-router.get('/nearBy', (req, res) => {
-    let data = []
-    async.waterfall([
-        //地址信息
-        (callback) => {
-            //登录用户从数据库获取地址信息
-            if (req.session.logged) {
-                userModel.findOne({email: req.session.email}, {location: 1, email: 1}).exec((error, doc) => {
-                    callback(error, doc.location)
-                })
-            }
-            //未登录用户使用ip判断地址
-            else {
-                const ip = req.ip
-                userService.getAddress_old(ip, (error, response) => callback(error, response))
-            }
-        },
-        //从数据库返回-city
-        (location, callback) => {
-            //console.log(location)
-            museumModel.find({'location.city': location.city}, {
-                name: 1,
-                startTime: 1,
-                admin: 1,
-                image: 1,
-                location: 1
-            }).exec((error, docs) => {
-                if (error) {
-                    callback(error)
-                } else {
-                    //console.log(docs)
-                    data = docs
-                    callback(null, location)
-                }
-            })
-        },
-        //从数据库返回-province,
-        (location, callback) => {
-            museumModel.find({'location.province': location.province, 'location.city': {$ne: location.city}}, {
-                name: 1,
-                startTime: 1,
-                admin: 1,
-                image: 1,
-                location: 1
-            }).exec((error, docs) => {
-                if (error) {
-                    callback(error)
-                } else {
-                    //console.log(docs)
-                    for (const i in docs) {
-                        data.push(docs[i])
-                    }
-                    callback(null, data)
-                }
-            })
+router.get('/nearBy', async (req, res) => {
+    try {
+        let location
+        //登录用户从数据库获取地址信息
+        if (req.session.logged) {
+            const email = req.session.email
+            const doc = await userModel.find(email, {location: 1, email: 1})
+            location = doc.location
         }
-
-    ], (error, result) => {
-        if (error) {
-            res.send({
-                status: false,
-                msg: error.message,
-                data: null
-            })
-        } else {
-            res.send({
-                status: true,
-                msg: '返回附近的museum',
-                data: result
-            })
+        //未登录用户使用ip判断地址
+        else {
+            const ip = req.ip
+            location = await userService.getAdress(ip)
         }
-    })
+        let data = []
+        const dataByCity = await museumModel.find({'location.city': location.city}, {
+            name: 1,
+            startTime: 1,
+            admin: 1,
+            image: 1,
+            location: 1
+        })
+        data = dataByCity
+        const dataByProvince = await museumModel.find({'location.province': location.province}, {
+            name: 1,
+            startTime: 1,
+            admin: 1,
+            image: 1,
+            location: 1
+        })
+        let flag, i, k
+        for (i in dataByProvince) {
+            flag = true
+            for (k in dataByCity) {
+                if (dataByCity[k]._id === dataByProvince[i]._id) {
+                    flag = false
+                }
+            }
+            if (flag) {
+                data.push(dataByProvince[k])
+            }
+            data.push(dataByProvince[i])
+        }
+        res.send({
+            status: true,
+            msg: '返回附近的museum',
+            data
+        })
+    } catch (error) {
+        res.send({
+            status: false,
+            msg: `${error.name} : ${error.message}`,
+            data: null
+        })
+    }
 })
 
 //museum detail
-router.get('/detail', (req, res) => {
-    let id = req.query.id || ''
-    //console.log(id)
-    async.waterfall([
-        //string to objectID
-        (callback) => {
-            if (id.length !== 24) {
-                callback(new Error(`id长度应该为24，当前长度：${id.length}`))
-            } else {
-                id = mongoose.Types.ObjectId(id)
-                callback(null, id)
-            }
-        },
-        //获取museum信息
-        (objectId, callback) => {
-            console.log(objectId)
-            museumModel.findOne({_id: objectId}).exec((error, doc) => {
-                if (error) {
-                    callback(error)
-                } else {
-                    if (doc === null) {
-                        callback(new Error('无此博物馆'))
-                    } else {
-                        callback(null, doc)
-                    }
-                }
-            })
-        },
-        //获取museum里面的memory
-        (document, callback) => {
-            callback(null, document)
+router.get('/detail', async (req, res) => {
+    const id = req.query.id || ''
+    try {
+        if (id.length !== 24) {
+            throw new TypeError(`id 需要是长度为24的ObjectID，当前长度：${id.length}`)
         }
-    ],
-    (error, result) => {
-        if (error) {
-            res.send({
-                status: false,
-                msg: error.message,
-                data: null
-            })
-        } else {
-            res.send({
-                status: true,
-                msg: '返回museum的详细信息',
-                data: result
-            })
-        }
-    })
+        const _id = mongoose.Types.ObjectId(id)
+        const doc = await museumModel.findOne({_id})
+        //获取museum里面的memory(default)
+        res.send({
+            status: true,
+            msg: 'museum详细信息',
+            data: doc
+        })
+    } catch (error) {
+        res.send({
+            status: false,
+            msg: `${error.name} : ${error.message}`,
+            data: null
+        })
+    }
 })
 
 //创建
-router.post('/create', upload.single('image'), (req, res) => {
+router.post('/create', upload.single('image'), async (req, res) => {
 
     let data = req.body || {}
     data = JSON.parse(data.info)
