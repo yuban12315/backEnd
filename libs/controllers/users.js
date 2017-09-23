@@ -41,7 +41,7 @@ router.post('/getVcode', async (req, res, next) => {
 //注册
 router.post('/register', async (req, res, next) => {
     try {
-        const data = req.body
+        const data = req.body || {}
         let status
         if (!data.hasOwnProperty('nickname')) {
             status = false
@@ -72,7 +72,7 @@ router.post('/register', async (req, res, next) => {
                 status = false
             }
         }
-        if (!status){
+        if (!status) {
             throw new Error('未通过结构验证')
         }
         if (!req.session.vcode) {
@@ -81,15 +81,16 @@ router.post('/register', async (req, res, next) => {
         if (data.vcode !== req.session.vcode) {
             throw new Error('验证码错误')
         }
+        req.session.vcode = null
         data.location = await userService.getAdress(req.ip) //获取位置
         const salt = uuid().toString().substring(0, 8) //加密salt
-        data._salt=salt
-        data.password=userService.secret(data.password,salt)
-        const user=new userModel(data)
+        data._salt = salt
+        data.password = userService.secret(data.password, salt)
+        const user = new userModel(data)
         await user.save()
         res.send({
-            status:true,
-            msg:'注册成功'
+            status: true,
+            msg: '注册成功'
         })
     } catch (error) {
         next(error)
@@ -97,93 +98,34 @@ router.post('/register', async (req, res, next) => {
 })
 
 //登录
-router.post('/login', (req, res) => {
+router.post('/login', async (req, res, next) => {
     //判断是否已经登录
-    if (req.session.logged == true) {
+    if (req.session.logged === true) {
         res.send({
             status: true,
-            msg: '已经登录过'
+            msg: '已经登录过了'
         })
     } else {
         const data = req.body || {}
-        //console.log(data)
-        async.waterfall([
-            //检查data结构
-            (callback) => {
-                let status = true
-                if (!data.hasOwnProperty('email')) {
-                    status = false
-                } else {
-                    if (data.email.length < 6) {
-                        status = false
-                    }
-                }
-                if (!data.hasOwnProperty('password')) {
-                    status = false
-                } else {
-                    if (data.password.length < 6) {
-                        status = false
-                    }
-                }
-                if (status) {
-                    callback(null)
-                } else {
-                    callback(new Error('未通过结构验证'))
-                }
-            },
-            //获取地址
-            (callback) => {
-                userService.getAddress_old(req.ip, (error, response) => callback(error, response))
-            },
-            //登录
-            (location, callback) => {
-                userModel.findOne({email: data.email}).exec((err, docs) => {
-                    if (err) {
-                        callback(err)
-                    }
-                    else {
-                        if (docs === null) {
-                            callback(new Error('用户不存在'))
-                        } else {
-                            const password = userService.secret(data.password, docs._salt)
-                            if (password !== docs.password) {
-                                callback(new Error('密码错误'))
-                            }
-                            else {
-                                callback(null, location)
-                            }
-                            //data.password = md5.update(data.password).digest('hex');
-                        }
-                    }
-                })
-            },
-            //修改地址
-            (location, callback) => {
-                userModel.update({email: data.email}, {
-                    $set: {
-                        location: {
-                            city: location.city,
-                            province: location.province
-                        }
-                    }
-                }).exec((error) => callback(error))
+        try {
+            const doc = await userModel.findOne({email: data.email})
+            if (doc === null) {
+                throw new Error(`该用户不存在，email：${data.email || 'null'}`)
             }
-        ], (err) => {
-            if (err) {
-                res.send({
-                    status: false,
-                    msg: err.message
-                })
-            } else {
-                req.session.logged = true
-                req.session.email = data.email
-                //console.log(req.session.email + ' ' + req.session.logged)
-                res.send({
-                    status: true,
-                    msg: '登录成功'
-                })
+
+            const password = userService.secret(data.password, doc._salt)
+            if (doc.password !== password) {
+                throw new Error('密码错误')
             }
-        })
+            const location = userService.getAdress(req.ip)
+            await userModel.update({email: data.email}, {$set: {location}})
+            res.send({
+                status: true,
+                msg: '登录成功'
+            })
+        } catch (error) {
+            next(error)
+        }
     }
 })
 
@@ -206,65 +148,26 @@ router.get('/logout', (req, res) => {
 })
 
 //获取重置密码时验证码
-router.post('/getVcode2', (req, res) => {
-    const mailAdress = req.body.mailTo || null
-    if (mailAdress) {
-        async.waterfall([
-            //检查邮箱是否是注册邮箱
-            (callback) => {
-                userModel.findOne({email: mailAdress}).exec((err, docs) => {
-                    if (err) {
-                        callback(err)
-                    } else if (docs == null) {
-                        callback(new Error('用户邮箱不存在'))
-                    }
-                    else {
-                        callback(null)
-                    }
-                })
-            },
-            //发送邮件
-            (callback) => {
-                //生成验证码
-                const vcode = uuid().toString().substring(0, 6)
-                //验证码存入session
-                req.session.vcode2 = vcode
-                mailer.sendMail({
-                    mailTo: mailAdress,
-                    vcode,
-                    type: 'resetPassword'
-                }, (err) => {
-                    //出现错误
-                    if (err) {
-                        callback(err)
-                    }
-                    //发送成功
-                    else {
-                        callback(null)
-                    }
-                })
-            }
-        ], (err) => {
-            if (err) {
-                res.send({
-                    status: false,
-                    msg: err.message
-                })
-            }
-            else {
-                res.send({
-                    status: true,
-                    msg: '发送邮件成功'
-                })
-            }
+router.post('/getVcode2', async (req, res, next) => {
+    try {
+        const email = req.body.mailTo || null
+        const doc = await userModel.findOne({email})
+        if (doc === null) {
+            throw new Error('用户邮箱不存在')
+        }
+        const vcode2 = uuid().toString().substring(0, 6)
+        req.session.vcode2=vcode2
+        await mailer.sendMail({
+            mailTo: email,
+            vcode2,
+            type: 'resetPassword'
         })
-    }
-    //未发送邮件
-    else {
         res.send({
-            status: false,
-            msg: '邮箱地址缺省'
+            status:true,
+            msg:'发送邮件成功'
         })
+    } catch (error) {
+        next(error)
     }
 })
 
@@ -459,6 +362,7 @@ router.post('/resetProfile', (req, res) => {
 router.post('/resetAvatar', upload.single('avatar'), async (req, res, next) => {
     const data = req.body || {}
     try {
+        const a = 1
     } catch (error) {
         next(error)
     }
