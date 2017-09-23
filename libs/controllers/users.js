@@ -41,8 +41,56 @@ router.post('/getVcode', async (req, res, next) => {
 //注册
 router.post('/register', async (req, res, next) => {
     try {
-        const data = req.body || {}
-
+        const data = req.body
+        let status
+        if (!data.hasOwnProperty('nickname')) {
+            status = false
+        }
+        // else {
+        //     if (data.nickname.length < 6) {
+        //         status = false
+        //     }
+        // }
+        if (!data.hasOwnProperty('password')) {
+            status = false
+        } else {
+            if (data.password.length < 6) {
+                status = false
+            }
+        }
+        if (!data.hasOwnProperty('email')) {
+            status = false
+        } else {
+            if (!mailer.checkMail(data.email)) {
+                status = false
+            }
+        }
+        if (!data.hasOwnProperty('vcode')) {
+            status = false
+        } else {
+            if (data.vcode.length !== 6) {
+                status = false
+            }
+        }
+        if (!status){
+            throw new Error('未通过结构验证')
+        }
+        if (!req.session.vcode) {
+            throw new Error('请先获取验证码')
+        }
+        if (data.vcode !== req.session.vcode) {
+            throw new Error('验证码错误')
+        }
+        data.location = await userService.getAdress(req.ip) //获取位置
+        const salt = uuid().toString().substring(0, 8) //加密salt
+        data._salt=salt
+        data.password=userService.secret(data.password,salt)
+        const user=new userModel(data)
+        await user.save()
+        res.send({
+            status:true,
+            msg:'注册成功'
+        })
     } catch (error) {
         next(error)
     }
