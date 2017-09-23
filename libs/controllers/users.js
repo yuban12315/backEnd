@@ -14,179 +14,38 @@ router.get('/', function (req, res) {
 })
 
 //获取注册时验证码
-router.post('/getVcode', (req, res) => {
-    const mailAdress = req.body.mailTo || null
-    //console.log(req.body)
-    if (mailAdress) {
-        //async 版
-        async.waterfall([
-            //检查邮箱是否已经被注册
-            (callback) => {
-                userModel.findOne({email: mailAdress}).exec((err, docs) => {
-                    if (err) {
-                        callback(err)
-                    } else if (docs != null) {
-                        callback(new Error('邮箱已被使用'))
-                    }
-                    else {
-                        callback(null)
-                    }
-                })
-            },
-            //发送邮件
-            (callback) => {
-                //生成验证码
-                const vcode = uuid().toString().substring(0, 6)
-                //验证码存入session
-                req.session.vcode = vcode
-                mailer.sendMail({
-                    mailTo: mailAdress,
-                    vcode,
-                    type: 'register'
-                }, (err) => {
-                    //出现错误
-                    if (err) {
-                        callback(err)
-                    }
-                    //发送成功
-                    else {
-                        callback(null)
-                    }
-                })
-            }
-        ], (err) => {
-            if (err) {
-                res.send({
-                    status: false,
-                    msg: err.message
-                })
-            }
-            else {
-                res.send({
-                    status: true,
-                    msg: '发送邮件成功'
-                })
-            }
+router.post('/getVcode', async (req, res, next) => {
+    try {
+        const email = req.body.mailTo
+        //检查邮箱是否已经被注册
+        const doc = await userModel.findOne({email})
+        if (doc != null) {
+            throw new Error('邮箱已被使用')
+        }
+        const vcode = uuid().toString().substring(0, 6)
+        req.session.vcode = vcode
+        await mailer.sendMail({
+            mailTo: email,
+            vcode,
+            type: 'register'
         })
-        //async await版
-    }
-    //未发送邮件
-    else {
         res.send({
-            status: false,
-            msg: '邮箱地址缺省'
+            status: true,
+            msg: '发送邮件成功'
         })
+    } catch (error) {
+        next(error)
     }
 })
 
 //注册
-router.post('/register', (req, res) => {
-    const data = req.body || {}
-    async.waterfall([
-        //检查data结构
-        (callback) => {
-            let status = true
-            if (!data.hasOwnProperty('nickname')) {
-                status = false
-            }
-            // else {
-            //     if (data.nickname.length < 6) {
-            //         status = false
-            //     }
-            // }
-            if (!data.hasOwnProperty('password')) {
-                status = false
-            } else {
-                if (data.password.length < 6) {
-                    status = false
-                }
-            }
-            if (!data.hasOwnProperty('email')) {
-                status = false
-            } else {
-                if (!mailer.checkMail(data.email)) {
-                    status = false
-                }
-            }
-            if (!data.hasOwnProperty('vcode')) {
-                status = false
-            } else {
-                if (data.vcode.length != 6) {
-                    status = false
-                }
-            }
-            if (status) {
-                callback(null)
-            } else {
-                callback(new Error('未通过结构验证'))
-            }
-        },
-        //检查验证码是否正确
-        (callback) => {
-            if (!req.session.vcode) {
-                callback(new Error('请先获取验证码'))
-            }
-            else if (data.vcode != req.session.vcode) {
-                callback(new Error('验证码错误'))
-            }
-            else {
-                callback(null)
-            }
-        },
-        //检查邮箱是否被占用
-        (callback) => {
-            userModel.findOne({email: data.email}).exec((err, docs) => {
-                if (err) {
-                    callback(err)
-                } else if (docs != null) {
-                    callback(new Error('邮箱已被占用'))
-                }
-                //未被占用
-                else {
-                    callback(null)
-                }
-            })
-        },
-        //获取位置
-        (callback) => {
-            userService.getAddress_old(req.ip, (err, loc) => {
-                if (err) {
-                    callback(err)
-                }
-                else {
-                    callback(null, loc)
-                }
-            })
-        },
-        //用户信息存入数据库
-        (location, callback) => {
-            data._salt = uuid().toString().substring(0, 8)
-            data.location = location
-            data.password = userService.secret(data.password, data._salt)
-            const user = new userModel(data)
-            user.save((err, docs) => {
-                if (err) {
-                    callback(err)
-                }
-                else {
-                    callback(null)
-                }
-            })
-        }
-    ], (err) => {
-        if (err) {
-            res.send({
-                status: false,
-                msg: err.message
-            })
-        }
-        else {
-            res.send({
-                status: true,
-                msg: '注册成功'
-            })
-        }
-    })
+router.post('/register', async (req, res, next) => {
+    try {
+        const data = req.body || {}
+
+    } catch (error) {
+        next(error)
+    }
 })
 
 //登录
