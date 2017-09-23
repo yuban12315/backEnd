@@ -10,7 +10,6 @@ const multer = require('multer'),
     fs = require('fs'),
     storage = multer.diskStorage({
         destination(req, file, cb) {
-
             cb(null, './uploads/') // 保存的路径，备注：需要自己创建
         },
         //给上传文件重命名

@@ -9,7 +9,7 @@ class userService {
     }
 
     //获取地址(async版)
-    static getAddress_old(ip, callback) {
+    getAddress_old(ip, callback) {
         /*默认返回服务器地址*/
         request.get(`http://int.dpool.sina.com.cn/iplookup/iplookup.php?format=js&ip=${ip}`).charset('utf-8').end((err, res) => {
             if (err || !res.hasOwnProperty('text')) {
@@ -37,10 +37,10 @@ class userService {
     }
 
     //获取地址(es6版)
-    static async getAdress(ip) {
+    async getAdress(ip) {
         let remoteIP
         if (ip === '127.0.0.1') remoteIP = '183.175.12.157'
-        else remoteIP=ip
+        else remoteIP = ip
         const res = await request.get(`http://int.dpool.sina.com.cn/iplookup/iplookup.php?format=js&ip=${remoteIP}`).charset('utf-8')
         //console.log(res)
         const text = res.text.substring(res.text.indexOf('{'), res.text.indexOf(';'))
@@ -56,12 +56,17 @@ class userService {
     }
 
     //加密
-    static secret(password, salt) {
+    secret(password, salt) {
         //docs.password != md5.update(data.password + docs._salt).digest('hex')
         const md5 = crypto.createHash('md5')
         md5.update(password + salt)
         return md5.digest('hex')
     }
+
+    //检查登录
+    async checkLogin(session) {
+
+    }
 }
 
-module.exports = userService
+module.exports = new userService()

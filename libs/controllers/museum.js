@@ -1,11 +1,10 @@
 const express = require('express'),
-    async = require('async'),
     router = express.Router(),
     userModel = require('./../dbs/models/userModel'),
     userService = require('./../services/userService'),
-    upload = require('./../utils/museumImage'),
+    upload = require('./../utils/upload'),
     console = require('tracer').console(),
-    fileService = require('../services/fileService_old'),
+    fileService = require('../services/fileService'),
     museumModel = require('./../dbs/models/museumModel'),
     mongoose = require('mongoose')
 
@@ -89,77 +88,40 @@ router.get('/detail', async (req, res, next) => {
 
 //创建
 router.post('/create', upload.single('image'), async (req, res, next) => {
-
     try {
         let data = req.body || {}
         data = JSON.parse(data.info)
-        if (!req.file) {
-            throw new Error('未获取到文件')
-        }
-        const filename=req.file.filename
-        await fileService.upload(filename)
+        console.log(data)
+        const resBody = await fileService.upload(req.file, 'museum')
+        data.image = `http://ocxi5zst0.bkt.clouddn.com/${resBody.key}`
+        const museum = new museumModel(data)
+        await museum.save()
         res.send({
-            status:true,
-            msg:'创建museum成功'
+            status: true,
+            msg: '创建museum成功'
         })
     } catch (error) {
-        res.send({
-            status: false,
-            msg: `${error.name} : ${error.message}`,
-            data: null
-        })
+        next(error)
     }
-
-    // async.waterfall([
-    //     //图片处理
-    //     (callback) => {
-    //         if (!req.file) {
-    //             callback(new Error('未获取到文件'))
-    //         } else {
-    //             const filename = req.file.filename
-    //             fileService.upload(filename, (error, response) => {
-    //                 if (error) {
-    //                     callback(error)
-    //                 }
-    //                 else {
-    //                     //console.log(response)
-    //                     data.image = `http://ocxi5zst0.bkt.clouddn.com/${response.key}`
-    //                     callback(null)
-    //                 }
-    //             })
-    //         }
-    //     },
-    //     //存数据库
-    //     (callback) => {
-    //         const museum = new museumModel(data)
-    //         museum.save((error, docs) => {
-    //             if (error) {
-    //                 callback(error)
-    //             }
-    //             else {
-    //                 callback(null)
-    //             }
-    //         })
-    //     }
-    // ], (err) => {
-    //     if (err) {
-    //         res.send({
-    //             status: false,
-    //             msg: err.message
-    //         })
-    //     }
-    //     else {
-    //         res.send({
-    //             status: true,
-    //             msg: '创建museum成功'
-    //         })
-    //     }
-    // })
 })
 
 //修改
 router.post('/update', upload.single('image'), (req, res) => {
-
+    for (const i in req.file) {
+        console.log(i)
+        console.log(req.file[i].toString().substring(0, 20))
+    }
+    res.send(req.file)
 })
+
+router.post('/test', upload.single('image'), (req, res) => {
+    let data = req.body || {}
+    console.log(data)
+    data = JSON.parse(data.info)
+    data.filesize = req.file.buffer.length
+    console.log(data)
+    res.send(data)
+})
+
 
 module.exports = router
