@@ -156,15 +156,15 @@ router.post('/getVcode2', async (req, res, next) => {
             throw new Error('用户邮箱不存在')
         }
         const vcode2 = uuid().toString().substring(0, 6)
-        req.session.vcode2=vcode2
+        req.session.vcode2 = vcode2
         await mailer.sendMail({
             mailTo: email,
             vcode2,
             type: 'resetPassword'
         })
         res.send({
-            status:true,
-            msg:'发送邮件成功'
+            status: true,
+            msg: '发送邮件成功'
         })
     } catch (error) {
         next(error)
@@ -172,126 +172,75 @@ router.post('/getVcode2', async (req, res, next) => {
 })
 
 //重置密码
-router.post('/resetPassword', (req, res) => {
-    const data = req.body || {}
-    async.waterfall([
-        //检查data结构
-        (callback) => {
-            let status = true
-            if (!data.hasOwnProperty('email')) {
+router.post('/resetPassword', async (req, res, next) => {
+    try {
+        const data = req.body || {}
+        let status = true
+        if (!data.hasOwnProperty('email')) {
+            status = false
+        } else {
+            if (!mailer.checkMail(data.email)) {
                 status = false
-            } else {
-                if (!mailer.checkMail(data.email)) {
-                    status = false
-                }
             }
-            if (!data.hasOwnProperty('password')) {
+        }
+        if (!data.hasOwnProperty('password')) {
+            status = false
+        } else {
+            if (data.password.length < 6) {
                 status = false
-            } else {
-                if (data.password.length < 6) {
-                    status = false
-                }
             }
-            if (!data.hasOwnProperty('vcode2')) {
+        }
+        if (!data.hasOwnProperty('vcode2')) {
+            status = false
+        } else {
+            if (data.vcode2.length !== 6) {
                 status = false
-            } else {
-                if (data.vcode2.length != 6) {
-                    status = false
-                }
             }
-            if (status) {
-                callback(null)
-            } else {
-                callback(new Error('未通过结构验证'))
-            }
-        },
-        //检查验证码
-        (callback) => {
-            if (!req.session.vcode2) {
-                callback(new Error('请先获取验证码'))
-            }
-            else if (data.vcode2 != req.session.vcode2) {
-                callback(new Error('验证码错误'))
-            }
-            else {
-                userModel.findOne({email: data.email}, {_salt: '1'}).exec((err, docs) => {
-                    if (err) {
-                        callback(err)
-                    }
-                    else {
-                        callback(null, docs._salt)
-                    }
-                })
-            }
-        },
-        //修改数据库内密码
-        (_salt, callback) => {
-            const password = userService.secret(data.password, _salt)
-            userModel.update({email: data.email}, {$set: {password}}).exec((err, doc) => {
-                if (err) {
-                    callback(err)
-                }
-                else if (doc.nModified != 1) {
-                    callback(new Error('修改密码失败'))
-                }
-                else {
-                    callback(null)
-                }
-            })
         }
-    ], (err) => {
-        if (err) {
-            res.send({
-                status: false,
-                msg: err.message
-            })
+        if (!status) {
+            throw new Error('未通过结构验证')
         }
-        else {
-            res.send({
-                status: true,
-                msg: '修改密码成功'
-            })
+        if (!req.session.vcode2) {
+            throw new Error('请先获取验证码')
         }
-    })
+        if (data.vcode2 !== req.session.vcode2) {
+            throw new Error('验证码错误')
+        }
+        const doc = await userModel.findOne({email: data.email}, {_salt: '1'})
+        const password = userService.secret(data.password, doc._salt)
+        await userModel.update({email: data.email}, {$set: {password}})
+        res.send({
+            status: true,
+            msg: '修改密码成功'
+        })
+    } catch (error) {
+        next(error)
+    }
 })
 
 //获取个人资料
-router.get('/getProfile', (req, res) => {
-    async.waterfall([
-        (callback) => {
-            const email = req.query.email || req.session.email
-            userModel.findOne({email}, {
-                email: 1,
-                nickname: 1,
-                sex: 1,
-                desc: 1,
-                location: 1,
-                avatar: 1
-            }).exec((error, doc) => {
-                if (error) {
-                    callback(error)
-                }
-                else if (doc === null) {
-                    callback(new Error('无此用户'))
-                }
-                else callback(null, doc)
-            })
+router.get('/getProfile', async (req, res, next) => {
+    try {
+        const email = req.query.email | req.session.email
+        const doc = await userModel.find({email},{
+            email: 1,
+            nickname: 1,
+            sex: 1,
+            desc: 1,
+            location: 1,
+            avatar: 1
+        })
+        if (doc === null) {
+            throw new Error('无此用户')
         }
-    ], (err, result) => {
-        if (err) {
-            res.send({
-                status: false,
-                msg: err.message
-            })
-        }
-        else {
-            res.send({
-                status: true,
-                msg: '返回个人资料',
-                data: result
-            })
-        }
-    })
+        res.send({
+            status:true,
+            msg: '返回个人资料',
+            data: doc
+        })
+    } catch (error) {
+        next(error)
+    }
 })
 
 //重置个人资料
