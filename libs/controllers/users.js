@@ -5,9 +5,8 @@ const express = require('express'),
     async = require('async'),
     userModel = require('./../dbs/models/userModel'),
     router = express.Router(),
-    console = require('tracer').console(),
-    upload = require('./../utils/avatarUpload'),
-    fileService = require('../services/fileService_old')
+    upload = require('./../utils/upload'),
+    fileService = require('../services/fileService')
 
 router.get('/', function (req, res) {
     res.send(`respond with a resource:${req.ip}`)
@@ -222,7 +221,7 @@ router.post('/resetPassword', async (req, res, next) => {
 router.get('/getProfile', async (req, res, next) => {
     try {
         const email = req.query.email | req.session.email
-        const doc = await userModel.find({email},{
+        const doc = await userModel.find({email}, {
             email: 1,
             nickname: 1,
             sex: 1,
@@ -234,7 +233,7 @@ router.get('/getProfile', async (req, res, next) => {
             throw new Error('无此用户')
         }
         res.send({
-            status:true,
+            status: true,
             msg: '返回个人资料',
             data: doc
         })
@@ -244,150 +243,47 @@ router.get('/getProfile', async (req, res, next) => {
 })
 
 //重置个人资料
-router.post('/resetProfile', (req, res) => {
-    const data = req.body || {}
-    //console.log(data)
-    if (req.session.logged === true) {
-        async.waterfall([
-            (callback) => {
-                let status = true
-                if (!data.hasOwnProperty('nickname')) {
-                    status = false
-                }
-                if (!data.hasOwnProperty('desc')) {
-                    status = false
-                }
-                if (!data.hasOwnProperty('sex')) {
-                    status = false
-                }
-                if (status) {
-                    callback(null)
-                } else {
-                    callback(new Error('未通过结构验证'))
-                }
-            },
-            (callback) => {
-                userModel.update({email: req.session.email}, {
-                    $set: {
-                        nickname: data.nickname,
-                        desc: data.desc,
-                        sex: data.sex
-                    }
-                }).exec((err, doc) => {
-                    if (err) {
-                        callback(err)
-                    }
-                    else if (doc.nModified != 1) {
-                        callback(new Error('修改昵称失败'))
-                    }
-                    else {
-                        callback(null)
-                    }
-                })
-            }
-        ], (err) => {
-            if (err) {
-                res.send({
-                    status: false,
-                    msg: err.message
-                })
-            }
-            else {
-                res.send({
-                    status: true,
-                    msg: '修改资料成功'
-                })
+router.post('/resetProfile', async (req, res, next) => {
+    try {
+        if (!req.session.logged) {
+            throw new Error('请先登录')
+        }
+        const data = req.body || {}
+        const email = req.session.email
+        await userModel.update({email}, {
+            $set: {
+                nickname: data.nickname,
+                desc: data.desc,
+                sex: data.sex
             }
         })
-    } else {
         res.send({
-            status: false,
-            msg: '请先登录'
+            status: true,
+            msg: '修改资料成功'
         })
+    } catch (error) {
+        next(error)
     }
 })
 
 //修改头像
 router.post('/resetAvatar', upload.single('avatar'), async (req, res, next) => {
-    const data = req.body || {}
     try {
-        const a = 1
+        if (!req.session.logged) {
+            throw new Error('请先登录')
+        }
+        const resBody = await fileService.upload(req.file, 'avatar')
+        const avatar = `http://ocxi5zst0.bkt.clouddn.com/${resBody.key}`
+        const email = req.session.email
+        await userModel.update({email}, {$set: {avatar}})
+        res.send({
+            status: true,
+            msg: '修改头像成功'
+        })
     } catch (error) {
         next(error)
     }
-
-    //console.log(data)
-    // if (req.session.logged === true) {
-    //     //console.log(req.file.buffer)
-    //     async.waterfall([
-    //         //头像文件上传七牛云
-    //         (callback) => {
-    //             const filename = req.file.filename
-    //             //console.log(filename)
-    //             if (!filename) {
-    //                 callback(new Error('未获取到文件'))
-    //             } else {
-    //                 fileService.upload(filename, (error, response) => {
-    //                     if (error) {
-    //                         callback(error)
-    //                     }
-    //                     else {
-    //                         //console.log(response)
-    //                         callback(null, response.key)
-    //                     }
-    //                 })
-    //             }
-    //         },
-    //         //修改的头像存数据库
-    //         (avatar, callback) => {
-    //             userModel.update({email: req.session.email}, {
-    //                 $set: {avatar: `http://ocxi5zst0.bkt.clouddn.com/${avatar}`}
-    //             }).exec((err, doc) => {
-    //                 if (err) {
-    //                     callback(err)
-    //                 }
-    //                 else if (doc.nModified != 1) {
-    //                     callback(new Error('修改头像失败'))
-    //                 }
-    //                 else {
-    //                     callback(null, avatar)
-    //                 }
-    //             })
-    //         }
-    //     ], (err, avatar) => {
-    //         if (err) {
-    //             res.send({
-    //                 status: false,
-    //                 msg: err.message
-    //             })
-    //         }
-    //         else {
-    //             res.send({
-    //                 status: true,
-    //                 msg: '修改头像成功',
-    //                 avatar
-    //             })
-    //         }
-    //     })
-    // } else {
-    //     res.send({
-    //         status: false,
-    //         msg: '请先登录'
-    //     })
-    // }
 })
 
-//test 文件测试路径
-// router.post('/testFile', upload.single("avatar"), (req, res) => {
-//     let data = req.body || {}
-//     console.log(data || "data = null")
-//     console.log(req.file || "file = null")
-//     //let filename = req.file.filename
-//
-//     res.send({
-//         file: req.file,
-//         data: req.body
-//     })
-// })
 
 module.exports = router
