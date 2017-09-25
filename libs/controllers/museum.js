@@ -81,11 +81,14 @@ router.get('/detail', async (req, res, next) => {
         }
         //获取museum里面的memory(default)
         const docs = await memoryModel.find({museumID: _id})
-        doc.memories = docs
+        const data=JSON.parse(JSON.stringify(doc))
+        console.log(docs)
+        data.memories = docs
+        console.log(doc)
         res.send({
             status: true,
             msg: 'museum详细信息',
-            data: doc
+            data
         })
     } catch (error) {
         next(error)
@@ -128,6 +131,5 @@ router.post('/test', upload.single('image'), (req, res) => {
     console.log(data)
     res.send(data)
 })
-
 
 module.exports = router

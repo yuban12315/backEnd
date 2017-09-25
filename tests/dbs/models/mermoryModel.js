@@ -19,13 +19,15 @@ const data = {
             index: 2
         }
     ],
-    published:true,
-    museumID:mongoose.Types.ObjectId('59c77a1a502a8a3bd018af0b'),
-    display:1
+    published: true,
+    museumID: mongoose.Types.ObjectId('59c77a1a502a8a3bd018af0b'),
+    display: 1
 }
-const run=async()=>{
-    const memory=new memoryModel(data)
-    let res=await memory.save()
-    console.log(res)
+const run = async () => {
+    //const memory=new memoryModel(data)
+    //let res=await memory.save()
+    let data=await memoryModel.find({museumID:mongoose.Types.ObjectId('59c77a1a502a8a3bd018af0b')})
+
+    console.log(data)
 }
 run()

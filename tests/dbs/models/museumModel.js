@@ -24,7 +24,7 @@ async function run() {
     const cursor =await museumModel.find({_id}).cursor();
     for (let doc = await cursor.next(); doc != null; doc = await cursor.next()) {
         // Prints "Val" followed by "Varun"
-        console.log(doc);
+        console.log(doc)
     }
 }
 run()
