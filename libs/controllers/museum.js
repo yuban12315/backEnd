@@ -6,7 +6,7 @@ const express = require('express'),
     console = require('tracer').console(),
     fileService = require('../services/fileService'),
     museumModel = require('./../dbs/models/museumModel'),
-    memoryModel=require('./../dbs/models/memoryModel'),
+    memoryModel = require('./../dbs/models/memoryModel'),
     mongoose = require('mongoose')
 
 router.get('/', (req, res) => {
@@ -76,12 +76,12 @@ router.get('/detail', async (req, res, next) => {
         }
         const _id = mongoose.Types.ObjectId(id)
         const doc = await museumModel.findOne({_id})
-        if (doc===null){
+        if (doc === null) {
             throw new Error('无此博物馆')
         }
         //获取museum里面的memory(default)
-        const docs=await memoryModel.find({owner:_id})
-        doc.memories=docs
+        const docs = await memoryModel.find({museumID: _id})
+        doc.memories = docs
         res.send({
             status: true,
             msg: 'museum详细信息',
