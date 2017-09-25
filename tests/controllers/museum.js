@@ -72,6 +72,6 @@ const data = {
 }
 
 const strObj = JSON.stringify(data)
-request.post(`${url}/create`).field('info',strObj).attach('image','homura.jpg').end((error, res)=>{
+request.post(`${url}/create`).field('info',strObj).attach('image','1.jpg').end((error, res)=>{
     console.log(res.text)
 })

@@ -13,7 +13,7 @@ const memorySchema = mongoose.Schema({
     photos: [{
         url: String,
         name: String,
-        index: String
+        index: Number
     }],
     published: Boolean,
     museumID: {
