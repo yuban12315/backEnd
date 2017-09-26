@@ -53,9 +53,8 @@ router.get('/nearBy', async (req, res, next) => {
                 }
             }
             if (flag) {
-                data.push(dataByProvince[k])
+                data.push(dataByProvince[i])
             }
-            data.push(dataByProvince[i])
         }
         res.send({
             status: true,

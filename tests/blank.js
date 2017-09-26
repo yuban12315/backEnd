@@ -1,16 +1,3 @@
-const sleep = (time) => {
-    return new Promise((resolve) => {
-        setTimeout(() => {
-            resolve('ttt')
-        }, time)
-    })
-}
-
-const run = async () => {
-    for (let i = 0; i < 3; i++) {
-        const res = await sleep(1000)
-        console.log(res)
-    }
-}
-run()
-
+let a={status:true,msg:'museum详细信息',data:{_id:'59c77a1a502a8a3bd018af0b',name:'测试博物馆',desc:'测试描述：1234567890，qwertyuiopasdfghjklzxcvbnm',startTime:'2017-09-24T09:25:45.412Z',image:'http://ocxi5zst0.bkt.clouddn.com/museum:57fc58f0-a10a-11e7-ac1d-f5489c9aeb51.jpg',__v:0,admin:{email:'455678228@qq.com'},location:{city:'包头',province:'内蒙古'},memories:[{_id:'59c856a576325e13f46ce5c6',desc:'スムーズ且つキチッと決まるfigmaオリジナル関節パーツで、劇中のあらゆるシーンを再現,正版 homura 手办',owner:'59b61a07ef570c285097dfb6',time:'2017-09-25T01:06:45.971Z',published:true,museumID:'59c77a1a502a8a3bd018af0b',display:1,__v:0,photos:[{url:'http://ocxi5zst0.bkt.clouddn.com/TB2Afs1XanD11BjSsziXXaReVXa_%21%2121546269.jpg',name:'1',index:0,_id:'59c856a576325e13f46ce5c8'},{url:'http://ocxi5zst0.bkt.clouddn.com/TB2DB73Xirz11Bjy1XaXXbRrFXa_%21%2121546269.jpg',name:'2',index:1,_id:'59c856a576325e13f46ce5c7'}]},{_id:'59c8573fc759c325648b461e',desc:'天泽夕映&紫河半夏，电五斗转星移',owner:'59b61a07ef570c285097dfb6',time:'2017-09-25T01:09:19.866Z',published:true,museumID:'59c77a1a502a8a3bd018af0b',display:1,__v:0,photos:[{url:'http://ocxi5zst0.bkt.clouddn.com/2017-08-09_20-50-02-000.jpg',name:'1',index:0,_id:'59c8573fc759c325648b4621'},{url:'http://ocxi5zst0.bkt.clouddn.com/2017-08-09_20-51-27-000.jpg',name:'2',index:1,_id:'59c8573fc759c325648b4620'},{url:'http://ocxi5zst0.bkt.clouddn.com/2017-08-09_20-55-13-000.jpg',name:'3',index:2,_id:'59c8573fc759c325648b461f'}]}]}}
+a = JSON.parse(a)
+console.log(a)
