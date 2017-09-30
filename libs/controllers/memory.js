@@ -6,20 +6,25 @@ const express = require('express'),
     upload = require('./../utils/upload'),
     console = require('tracer').console(),
     fileService = require('../services/fileService_old'),
-    memoryModel=require('./../dbs/models/memoryModel')
+    memoryModel = require('./../dbs/models/memoryModel')
 
-router.get('/', function(req, res, next) {
+router.get('/', function (req, res, next) {
     res.send(`router about memories${req.ip}`)
 })
 
-router.post('/create',(req, res)=>{
-    const data=req.body||{}
-    // async.waterfall([
-    //
-    // ])
+router.post('/create', async (req, res, next) => {
+    try {
+        if (!req.session.logged) {
+            throw new Error('请先登录')
+        }
+        let
+
+    } catch (error) {
+        next(error)
+    }
 })
 
-router.post('/testFile',upload.array('image'),(req, res)=>{
+router.post('/testFile', upload.array('image'), (req, res) => {
     const data = req.body || {}
     console.log(data || 'data = null')
     console.log(req.file || 'file = null')

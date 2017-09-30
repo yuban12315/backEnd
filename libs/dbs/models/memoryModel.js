@@ -20,7 +20,16 @@ const memorySchema = mongoose.Schema({
         type: mongoose.Schema.Types.ObjectId,
         required: true
     },
-    display: Number
+    display: Number,
+    like: {
+        type: Number,
+        default: 0
+    },
+
+    view: {
+        type: Number,
+        default: 0
+    }
 })
 
 const memoryModel = mongoose.model('memory', memorySchema)

@@ -155,10 +155,11 @@ router.post('/getVcode2', async (req, res, next) => {
             throw new Error('用户邮箱不存在')
         }
         const vcode2 = uuid().toString().substring(0, 6)
+        console.log(vcode2)
         req.session.vcode2 = vcode2
         await mailer.sendMail({
             mailTo: email,
-            vcode2,
+            vcode:vcode2,
             type: 'resetPassword'
         })
         res.send({

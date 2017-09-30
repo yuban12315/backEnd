@@ -30,6 +30,9 @@ const userSchema = new mongoose.Schema({
         type:String,
         default:'http://ocxi5zst0.bkt.clouddn.com/5657474daecbe02.jpg'
     }
+    // collect:[{
+    //     id:mongoose.Types.ObjectId
+    // }]
 
     //管理员（museum）
 
